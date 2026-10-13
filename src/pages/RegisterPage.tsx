@@ -31,7 +31,7 @@ export const RegisterPage: React.FC = () => {
   const [state, setState] = useState('RO');
 
   // DeMolay fields
-  const [chapterName, setChapterName] = useState('Capítulo Ariquemes nº 85');
+  const [chapterName, setChapterName] = useState('Capítulo Luciano de Assis nº 118');
   const [orderRank, setOrderRank] = useState('DeMolay Ativo');
   const [cid, setCid] = useState('');
 
@@ -251,7 +251,7 @@ export const RegisterPage: React.FC = () => {
                     <input
                       type="text"
                       required
-                      placeholder="Ex: Capítulo Ariquemes nº 85"
+                      placeholder="Ex: Capítulo Luciano de Assis nº 118"
                       value={chapterName}
                       onChange={(e) => setChapterName(e.target.value)}
                       className="w-full pl-10 pr-3 py-2 text-xs rounded-xl border border-slate-200 dark:border-navy-800 bg-slate-50 dark:bg-navy-950 text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-1 focus:ring-gold-500"

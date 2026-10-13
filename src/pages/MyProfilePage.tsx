@@ -223,7 +223,7 @@ export const MyProfilePage: React.FC = () => {
   };
 
   const chapterTitle = isDeMolay
-    ? currentUser.demolayDetails?.chapterName || 'Capítulo Ariquemes nº 85'
+    ? currentUser.demolayDetails?.chapterName || 'Capítulo Luciano de Assis nº 118'
     : currentUser.masonDetails?.lodgeName || 'Loja Maçônica Regular';
 
   const rankTitle = isDeMolay

@@ -249,7 +249,7 @@ export const DashboardPage: React.FC = () => {
             </div>
           </div>
           <div className="text-base sm:text-lg font-bold text-slate-900 dark:text-white truncate">
-            {userChapter?.name || 'Ariquemes nº 85'}
+            {userChapter?.name || 'Capítulo Luciano de Assis nº 118'}
           </div>
           <div className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
             {userChapter?.activeMembersCount || 42} membros regulares

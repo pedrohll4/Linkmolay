@@ -79,7 +79,7 @@ describe('LinkMolay - Testes dos Principais Fluxos do MVP', () => {
     // 1. Login com conta aprovada
     const approvedRes = api.login('pedro.henrique@demolay.org.br');
     expect(approvedRes.user).toBeDefined();
-    expect(approvedRes.user?.fullName).toBe('Pedro Henrique Lima');
+    expect(approvedRes.user?.fullName).toBe('Pedro Henrique Lima Leal');
 
     // 2. Suspender usuário
     const adminId = 'a0000000-0000-0000-0000-000000000001';

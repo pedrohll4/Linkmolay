@@ -108,7 +108,7 @@ USING (true);
 -- 9. Inserir ou atualizar perfis base no banco de dados na nuvem
 INSERT INTO public.profiles (id, email, full_name, role, status, verified, city, state, bio, phone, show_phone, linkedin_url, github_url)
 VALUES
-  ('d0000000-0000-0000-0000-000000000001', 'pedro.henrique@demolay.org.br', 'Pedro Henrique Lima', 'demolay', 'approved', TRUE, 'Ariquemes', 'RO', 'Estudante de Engenharia de Software, desenvolvedor Full-Stack apaixonado por TypeScript, React e Python. Past Mestre Conselheiro do Cap. Ariquemes.', '(69) 99345-0011', TRUE, 'https://linkedin.com/in/pedro-henrique-demo', 'https://github.com/pedro-demo'),
+  ('d0000000-0000-0000-0000-000000000001', 'pedro.henrique@demolay.org.br', 'Pedro Henrique Lima Leal', 'demolay', 'approved', TRUE, 'Ariquemes', 'RO', 'Estudante de Engenharia de Software, desenvolvedor Full-Stack apaixonado por TypeScript, React e Python. Past Mestre Conselheiro do Cap. Luciano de Assis nº 118.', '(69) 99345-0011', TRUE, 'https://linkedin.com/in/pedro-henrique-demo', 'https://github.com/pedro-demo'),
   ('m0000000-0000-0000-0000-000000000001', 'carlos.silva@silvatech.com.br', 'Carlos Eduardo da Silva', 'mason', 'approved', TRUE, 'Ariquemes', 'RO', 'Empresário do setor de tecnologia, diretor da Silva Tecnologia e entusiasta do desenvolvimento dos jovens DeMolays.', '(69) 99234-5678', TRUE, 'https://linkedin.com/in/carlos-silva-demo', NULL),
   ('a0000000-0000-0000-0000-000000000001', 'admin@linkmolay.com.br', 'Administrador LinkMolay', 'admin', 'approved', TRUE, 'Brasília', 'DF', 'Coordenação Geral da Plataforma LinkMolay e moderação institucional.', NULL, FALSE, NULL, NULL)
 ON CONFLICT (id) DO UPDATE SET
@@ -116,5 +116,28 @@ ON CONFLICT (id) DO UPDATE SET
   role = EXCLUDED.role,
   status = EXCLUDED.status,
   verified = EXCLUDED.verified;
+
+-- 10. Atualizar Capítulo Luciano de Assis nº 118 se tabela chapters existir
+DO $$ BEGIN
+  IF EXISTS (SELECT FROM pg_tables WHERE schemaname = 'public' AND tablename = 'chapters') THEN
+    INSERT INTO public.chapters (id, name, number, city, state, logo_url, master_councilor, contact_email, history, active_members_count)
+    VALUES (
+      'c1000000-0000-0000-0000-000000000001',
+      'Capítulo Luciano de Assis',
+      118,
+      'Ariquemes',
+      'RO',
+      '/chapters/luciano-de-assis-118.png',
+      'Lucas Albuquerque',
+      'lucianodeassis118@demolay.org.br',
+      'Fundado em Ariquemes - RO, o Capítulo Luciano de Assis nº 118 possui rica história dedicada à formação cívica, moral e de liderança para a juventude de Rondônia.',
+      42
+    )
+    ON CONFLICT (id) DO UPDATE SET
+      name = EXCLUDED.name,
+      number = EXCLUDED.number,
+      logo_url = EXCLUDED.logo_url;
+  END IF;
+END $$;
 
 SELECT 'LINKMOLAY: Storage e Perfis configurados com sucesso para acesso sincronizado entre dispositivos!' AS status;

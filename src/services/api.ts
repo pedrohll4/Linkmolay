@@ -225,7 +225,24 @@ export const api = {
   // USUÁRIOS & PERFIS
   // --------------------------------------------------------------------------
   getUsers(): UserProfile[] {
-    return getFromStorage<UserProfile[]>(KEYS.USERS, INITIAL_USERS);
+    const users = getFromStorage<UserProfile[]>(KEYS.USERS, INITIAL_USERS);
+    let changed = false;
+    for (const u of users) {
+      if (u.id === 'd0000000-0000-0000-0000-000000000001') {
+        if (u.fullName === 'Pedro Henrique Lima') {
+          u.fullName = 'Pedro Henrique Lima Leal';
+          changed = true;
+        }
+        if (u.demolayDetails && u.demolayDetails.chapterName.includes('Ariquemes')) {
+          u.demolayDetails.chapterName = 'Capítulo Luciano de Assis nº 118';
+          changed = true;
+        }
+      }
+    }
+    if (changed) {
+      saveToStorage(KEYS.USERS, users);
+    }
+    return users;
   },
 
   getUserById(id: string): UserProfile | null {
@@ -524,7 +541,22 @@ export const api = {
   // CAPÍTULOS
   // --------------------------------------------------------------------------
   getChapters(): Chapter[] {
-    return getFromStorage<Chapter[]>(KEYS.CHAPTERS, INITIAL_CHAPTERS);
+    const chapters = getFromStorage<Chapter[]>(KEYS.CHAPTERS, INITIAL_CHAPTERS);
+    let changed = false;
+    for (const c of chapters) {
+      if (c.id === 'c1000000-0000-0000-0000-000000000001') {
+        if (c.name !== 'Capítulo Luciano de Assis' || c.number !== 118) {
+          c.name = 'Capítulo Luciano de Assis';
+          c.number = 118;
+          c.logoUrl = '/chapters/luciano-de-assis-118.png';
+          changed = true;
+        }
+      }
+    }
+    if (changed) {
+      saveToStorage(KEYS.CHAPTERS, chapters);
+    }
+    return chapters;
   },
 
   getChapterById(id: string): Chapter | null {
