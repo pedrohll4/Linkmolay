@@ -29,6 +29,7 @@ import {
   INITIAL_NOTIFICATIONS,
   INITIAL_ADMIN_ACTIONS,
 } from './mockData';
+import { supabase, isSupabaseConfigured } from './supabase';
 
 // Storage Keys
 const STORAGE_PREFIX = 'linkmolay_';
@@ -244,7 +245,124 @@ export const api = {
 
     users[index] = updatedUser;
     saveToStorage(KEYS.USERS, users);
+
+    // Sincronizar em tempo real com o banco de dados Supabase na nuvem
+    if (isSupabaseConfigured && supabase) {
+      this.syncProfileToSupabase(updatedUser).catch((err) => {
+        console.warn('[Supabase Sync] Falha ao sincronizar perfil:', err);
+      });
+    }
+
     return updatedUser;
+  },
+
+  async syncProfileToSupabase(user: UserProfile): Promise<boolean> {
+    if (!isSupabaseConfigured || !supabase) return false;
+
+    try {
+      const row: Record<string, any> = {
+        id: user.id,
+        email: user.email,
+        full_name: user.fullName,
+        role: user.role,
+        status: user.status,
+        verified: user.verified,
+        avatar_url: user.avatarUrl || null,
+        banner_url: user.bannerUrl || null,
+        bio: user.bio || null,
+        city: user.city || 'Não informada',
+        state: user.state || 'UF',
+        phone: user.phone || null,
+        show_phone: user.showPhone ?? false,
+        linkedin_url: user.linkedinUrl || null,
+        instagram_url: user.instagramUrl || null,
+        github_url: user.githubUrl || null,
+        portfolio_url: user.portfolioUrl || null,
+        resume_url: user.resumeUrl || null,
+        show_resume: user.showResume ?? true,
+        updated_at: new Date().toISOString(),
+      };
+
+      const { error } = await supabase.from('profiles').upsert(row);
+      if (error) {
+        console.warn('[Supabase Sync] Erro ao sincronizar perfil no banco:', error.message);
+        return false;
+      }
+      console.log('[Supabase Sync] Perfil salvo com sucesso na nuvem:', user.id);
+      return true;
+    } catch (err) {
+      console.warn('[Supabase Sync] Exceção ao sincronizar perfil:', err);
+      return false;
+    }
+  },
+
+  async fetchCloudProfiles(): Promise<UserProfile[]> {
+    if (!isSupabaseConfigured || !supabase) return this.getUsers();
+
+    try {
+      const { data, error } = await supabase.from('profiles').select('*');
+      if (!error && data && data.length > 0) {
+        const localUsers = this.getUsers();
+        const mergedUsers = localUsers.map((u) => {
+          const cloud = data.find(
+            (p) => p.id === u.id || p.email.toLowerCase() === u.email.toLowerCase()
+          );
+          if (!cloud) return u;
+          return {
+            ...u,
+            avatarUrl: cloud.avatar_url || u.avatarUrl,
+            bannerUrl: cloud.banner_url || u.bannerUrl,
+            fullName: cloud.full_name || u.fullName,
+            bio: cloud.bio ?? u.bio,
+            city: cloud.city || u.city,
+            state: cloud.state || u.state,
+            phone: cloud.phone || u.phone,
+            linkedinUrl: cloud.linkedin_url || u.linkedinUrl,
+            githubUrl: cloud.github_url || u.githubUrl,
+            instagramUrl: cloud.instagram_url || u.instagramUrl,
+            resumeUrl: cloud.resume_url || u.resumeUrl,
+            verified: cloud.verified ?? u.verified,
+            status: cloud.status || u.status,
+          };
+        });
+
+        // Adicionar perfis criados em outros dispositivos
+        for (const cloud of data) {
+          const exists = mergedUsers.some(
+            (u) => u.id === cloud.id || u.email.toLowerCase() === cloud.email.toLowerCase()
+          );
+          if (!exists) {
+            mergedUsers.push({
+              id: cloud.id,
+              email: cloud.email,
+              fullName: cloud.full_name,
+              role: cloud.role,
+              status: cloud.status,
+              verified: cloud.verified,
+              avatarUrl: cloud.avatar_url,
+              bannerUrl: cloud.banner_url,
+              bio: cloud.bio || '',
+              city: cloud.city || '',
+              state: cloud.state || '',
+              phone: cloud.phone,
+              linkedinUrl: cloud.linkedin_url,
+              githubUrl: cloud.github_url,
+              instagramUrl: cloud.instagram_url,
+              resumeUrl: cloud.resume_url,
+              createdAt: cloud.created_at,
+              updatedAt: cloud.updated_at,
+            } as UserProfile);
+          }
+        }
+
+        saveToStorage(KEYS.USERS, mergedUsers);
+        return mergedUsers;
+      }
+    } catch (err) {
+      console.warn('[Supabase Sync] Falha ao carregar perfis da nuvem:', err);
+    }
+
+    return this.getUsers();
   },
 
   // --------------------------------------------------------------------------

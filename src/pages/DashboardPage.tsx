@@ -60,8 +60,8 @@ export const DashboardPage: React.FC = () => {
 
     try {
       setIsUploadingPostImage(true);
-      const uploadedUrl = await uploadImageFile(file, 'company-assets', 'banner');
-      setNewPostImage(uploadedUrl);
+      const uploadRes = await uploadImageFile(file, 'chapter-assets', 'banner');
+      setNewPostImage(uploadRes.url);
       setShowImageInput(true);
     } catch (err) {
       alert('Erro ao carregar imagem para o post.');

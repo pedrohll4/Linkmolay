@@ -30,6 +30,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const user = api.getCurrentUser();
     setCurrentUser(user);
     setLoading(false);
+
+    // Sincroniza perfis da nuvem (Supabase) em segundo plano para refletir mudanças de outros dispositivos
+    api.fetchCloudProfiles().then(() => {
+      const updatedUser = api.getCurrentUser();
+      if (updatedUser) {
+        setCurrentUser(updatedUser);
+      }
+    }).catch(() => {});
   }, []);
 
   useEffect(() => {

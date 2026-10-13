@@ -17,6 +17,7 @@ import {
   PRESET_AVATARS,
   uploadImageFile,
 } from '../../services/imageUpload';
+import { isSupabaseConfigured } from '../../services/supabase';
 
 interface ImageUploadModalProps {
   isOpen: boolean;
@@ -38,6 +39,10 @@ export const ImageUploadModal: React.FC<ImageUploadModalProps> = ({
   const [selectedImage, setSelectedImage] = useState<string>(currentImage || '');
   const [urlInput, setUrlInput] = useState<string>('');
   const [isProcessing, setIsProcessing] = useState<boolean>(false);
+  const [uploadFeedback, setUploadFeedback] = useState<{
+    type: 'cloud' | 'local' | 'error';
+    message: string;
+  } | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   if (!isOpen) return null;
@@ -50,8 +55,26 @@ export const ImageUploadModal: React.FC<ImageUploadModalProps> = ({
 
     try {
       setIsProcessing(true);
-      const uploadedUrl = await uploadImageFile(file, 'avatars', type);
-      setSelectedImage(uploadedUrl);
+      setUploadFeedback(null);
+      const res = await uploadImageFile(file, 'avatars', type);
+      setSelectedImage(res.url);
+
+      if (res.isCloud) {
+        setUploadFeedback({
+          type: 'cloud',
+          message: 'Foto salva com sucesso na nuvem Supabase Storage (sincronizada para todos os dispositivos)!',
+        });
+      } else if (res.errorMessage) {
+        setUploadFeedback({
+          type: 'error',
+          message: `Salvo no dispositivo local. O Supabase retornou: "${res.errorMessage}". Execute o script SQL no Supabase para salvar na nuvem.`,
+        });
+      } else {
+        setUploadFeedback({
+          type: 'local',
+          message: 'Salvo neste navegador. (Para sincronizar entre outros dispositivos, configure as chaves do Supabase na Vercel e execute o script SQL).',
+        });
+      }
     } catch (err) {
       alert('Erro ao processar imagem. Verifique se o formato é válido.');
     } finally {
@@ -86,20 +109,53 @@ export const ImageUploadModal: React.FC<ImageUploadModalProps> = ({
           <X className="h-5 w-5" />
         </button>
 
-        {/* Título do Modal */}
-        <div className="flex items-center gap-3 mb-5 pb-3 border-b border-amber-400/20">
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-amber-400/15 text-amber-400">
-            {type === 'avatar' ? <Camera className="h-5 w-5" /> : <ImageIcon className="h-5 w-5" />}
+        {/* Título do Modal e Status de Conexão */}
+        <div className="flex items-center justify-between gap-3 mb-5 pb-3 border-b border-amber-400/20">
+          <div className="flex items-center gap-3">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-amber-400/15 text-amber-400 shrink-0">
+              {type === 'avatar' ? <Camera className="h-5 w-5" /> : <ImageIcon className="h-5 w-5" />}
+            </div>
+            <div>
+              <h3 className="font-serif text-xl font-bold text-white">{title}</h3>
+              <p className="text-xs text-slate-400">
+                {type === 'avatar'
+                  ? 'Escolha sua foto oficial para identificação de perfil na Fraternidade'
+                  : 'Defina a capa heráldica de fundo do seu perfil executivo'}
+              </p>
+            </div>
           </div>
-          <div>
-            <h3 className="font-serif text-xl font-bold text-white">{title}</h3>
-            <p className="text-xs text-slate-400">
-              {type === 'avatar'
-                ? 'Escolha sua foto oficial para identificação de perfil na Fraternidade'
-                : 'Defina a capa heráldica de fundo do seu perfil executivo'}
-            </p>
+
+          <div className="shrink-0 hidden sm:block">
+            {isSupabaseConfigured ? (
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold bg-emerald-500/15 text-emerald-300 border border-emerald-500/30">
+                <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                Nuvem Ativa
+              </span>
+            ) : (
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold bg-amber-500/15 text-amber-300 border border-amber-500/30">
+                Modo Local
+              </span>
+            )}
           </div>
         </div>
+
+        {/* Feedback Dinâmico de Upload */}
+        {uploadFeedback && (
+          <div
+            className={`p-3 rounded-xl text-xs font-medium mb-4 flex items-start gap-2.5 animate-in fade-in duration-200 ${
+              uploadFeedback.type === 'cloud'
+                ? 'bg-emerald-500/15 border border-emerald-500/30 text-emerald-300'
+                : uploadFeedback.type === 'error'
+                ? 'bg-rose-500/15 border border-rose-500/30 text-rose-300'
+                : 'bg-amber-500/15 border border-amber-500/30 text-amber-300'
+            }`}
+          >
+            <span className="text-base leading-none">
+              {uploadFeedback.type === 'cloud' ? '☁️' : '⚠️'}
+            </span>
+            <div className="flex-1 leading-relaxed">{uploadFeedback.message}</div>
+          </div>
+        )}
 
         {/* Preview Atual */}
         <div className="mb-5 flex flex-col items-center justify-center p-3 rounded-2xl bg-[#070D1E] border border-slate-800">

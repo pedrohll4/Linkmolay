@@ -122,6 +122,12 @@ export async function compressImage(
   });
 }
 
+export interface UploadResult {
+  url: string;
+  isCloud: boolean;
+  errorMessage?: string;
+}
+
 /**
  * Faz upload de imagem:
  * - Se o Supabase estiver configurado com credenciais reais, envia para o bucket de Storage.
@@ -131,7 +137,7 @@ export async function uploadImageFile(
   file: File,
   bucket: 'avatars' | 'company-assets' | 'chapter-assets' = 'avatars',
   type: 'avatar' | 'banner' = 'avatar'
-): Promise<string> {
+): Promise<UploadResult> {
   const isAvatar = type === 'avatar';
   const maxWidth = isAvatar ? 600 : 1600;
   const maxHeight = isAvatar ? 600 : 900;
@@ -160,18 +166,34 @@ export async function uploadImageFile(
 
       if (error) {
         console.warn(`[Supabase Storage] Aviso no bucket '${bucket}':`, error.message);
+        return {
+          url: compressedDataUrl,
+          isCloud: false,
+          errorMessage: error.message,
+        };
       } else if (data) {
         const {
           data: { publicUrl },
         } = supabase.storage.from(bucket).getPublicUrl(filePath);
         console.log(`[Supabase Storage] Upload concluído com sucesso: ${publicUrl}`);
-        return publicUrl;
+        return {
+          url: publicUrl,
+          isCloud: true,
+        };
       }
-    } catch (err) {
+    } catch (err: any) {
       console.warn('[Supabase Storage] Falha ao comunicar com o Storage. Usando fallback local:', err);
+      return {
+        url: compressedDataUrl,
+        isCloud: false,
+        errorMessage: err?.message || 'Falha na conexão com o Supabase',
+      };
     }
   }
 
-  // 3. Fallback: Retorna o dataURL comprimido que é instantaneamente salvo no banco local
-  return compressedDataUrl;
+  // 3. Fallback: Retorna o dataURL comprimido que é salvo localmente
+  return {
+    url: compressedDataUrl,
+    isCloud: false,
+  };
 }

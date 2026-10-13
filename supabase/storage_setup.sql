@@ -1,9 +1,54 @@
 -- ==============================================================================
--- LINKMOLAY - SCRIPT DEDICADO DE CONFIGURAÇÃO DO SUPABASE STORAGE
--- Cole este script no SQL Editor do seu projeto Supabase e clique em RUN.
+-- LINKMOLAY - SCRIPT DEFINITIVO DE STORAGE E SINCRONIZAÇÃO EM NUVEM
+-- Execute este script no SQL Editor do seu projeto Supabase e clique em RUN.
+-- Ele habilita os buckets de fotos e libera a sincronização entre dispositivos.
 -- ==============================================================================
 
--- 1. Criação dos Buckets de Armazenamento
+-- 1. Habilitar extensões
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+CREATE EXTENSION IF NOT EXISTS "pgcrypto";
+
+-- 2. Criar ENUMs com tratamento de duplicidade
+DO $$ BEGIN
+  CREATE TYPE user_role AS ENUM ('demolay', 'mason', 'admin');
+EXCEPTION WHEN duplicate_object THEN NULL; END $$;
+
+DO $$ BEGIN
+  CREATE TYPE user_status AS ENUM ('pending', 'approved', 'rejected', 'suspended');
+EXCEPTION WHEN duplicate_object THEN NULL; END $$;
+
+-- 3. Criar a tabela public.profiles caso ainda não exista
+CREATE TABLE IF NOT EXISTS public.profiles (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  email TEXT NOT NULL UNIQUE,
+  full_name TEXT NOT NULL,
+  role user_role NOT NULL DEFAULT 'demolay',
+  status user_status NOT NULL DEFAULT 'pending',
+  verified BOOLEAN NOT NULL DEFAULT FALSE,
+  avatar_url TEXT,
+  banner_url TEXT,
+  bio TEXT,
+  city TEXT NOT NULL,
+  state TEXT NOT NULL,
+  phone TEXT,
+  show_phone BOOLEAN DEFAULT FALSE,
+  linkedin_url TEXT,
+  instagram_url TEXT,
+  github_url TEXT,
+  portfolio_url TEXT,
+  resume_url TEXT,
+  show_resume BOOLEAN DEFAULT TRUE,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- 4. Desvincular chave estrangeira restritiva de auth.users (permite sincronização imediata)
+ALTER TABLE IF EXISTS public.profiles DROP CONSTRAINT IF EXISTS profiles_id_fkey;
+
+-- 5. Garantir que a coluna banner_url existe
+ALTER TABLE IF EXISTS public.profiles ADD COLUMN IF NOT EXISTS banner_url TEXT;
+
+-- 6. Configurar os Buckets de Armazenamento no Supabase Storage
 INSERT INTO storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
 VALUES 
   ('avatars', 'avatars', true, 5242880, ARRAY['image/jpeg', 'image/png', 'image/webp', 'image/gif']),
@@ -15,37 +60,61 @@ ON CONFLICT (id) DO UPDATE SET
   file_size_limit = EXCLUDED.file_size_limit,
   allowed_mime_types = EXCLUDED.allowed_mime_types;
 
--- 2. Garantir coluna de banner no perfil de usuários
-ALTER TABLE IF EXISTS public.profiles ADD COLUMN IF NOT EXISTS banner_url TEXT;
-
--- 3. Políticas de Segurança RLS para os Arquivos (storage.objects)
-
--- Leitura pública para que qualquer usuário/visitante visualize fotos de perfis, capas e posts
+-- 7. Políticas de Segurança RLS para o Storage (storage.objects)
 DROP POLICY IF EXISTS "LinkMolay Storage - Leitura Pública" ON storage.objects;
 CREATE POLICY "LinkMolay Storage - Leitura Pública"
 ON storage.objects FOR SELECT
 USING (bucket_id IN ('avatars', 'company-assets', 'chapter-assets', 'resumes'));
 
--- Upload permitido para autenticados e clientes anon
 DROP POLICY IF EXISTS "LinkMolay Storage - Upload" ON storage.objects;
 CREATE POLICY "LinkMolay Storage - Upload"
 ON storage.objects FOR INSERT
 TO authenticated, anon
 WITH CHECK (bucket_id IN ('avatars', 'company-assets', 'chapter-assets', 'resumes'));
 
--- Atualização e substituição de imagens
 DROP POLICY IF EXISTS "LinkMolay Storage - Atualização" ON storage.objects;
 CREATE POLICY "LinkMolay Storage - Atualização"
 ON storage.objects FOR UPDATE
 TO authenticated, anon
 USING (bucket_id IN ('avatars', 'company-assets', 'chapter-assets', 'resumes'));
 
--- Exclusão de arquivos
 DROP POLICY IF EXISTS "LinkMolay Storage - Exclusão" ON storage.objects;
 CREATE POLICY "LinkMolay Storage - Exclusão"
 ON storage.objects FOR DELETE
 TO authenticated, anon
 USING (bucket_id IN ('avatars', 'company-assets', 'chapter-assets', 'resumes'));
 
--- Confirmação
-SELECT 'Buckets e Políticas do Supabase Storage configurados com sucesso para o LinkMolay!' AS status;
+-- 8. Políticas RLS para a Tabela public.profiles (Permitir sincronização entre navegadores e dispositivos)
+ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "LinkMolay Profiles - Leitura Pública" ON public.profiles;
+CREATE POLICY "LinkMolay Profiles - Leitura Pública"
+ON public.profiles FOR SELECT
+TO authenticated, anon
+USING (true);
+
+DROP POLICY IF EXISTS "LinkMolay Profiles - Inserção" ON public.profiles;
+CREATE POLICY "LinkMolay Profiles - Inserção"
+ON public.profiles FOR INSERT
+TO authenticated, anon
+WITH CHECK (true);
+
+DROP POLICY IF EXISTS "LinkMolay Profiles - Atualização" ON public.profiles;
+CREATE POLICY "LinkMolay Profiles - Atualização"
+ON public.profiles FOR UPDATE
+TO authenticated, anon
+USING (true);
+
+-- 9. Inserir ou atualizar perfis base no banco de dados na nuvem
+INSERT INTO public.profiles (id, email, full_name, role, status, verified, city, state, bio, phone, show_phone, linkedin_url, github_url)
+VALUES
+  ('d0000000-0000-0000-0000-000000000001', 'pedro.henrique@demolay.org.br', 'Pedro Henrique Lima', 'demolay', 'approved', TRUE, 'Ariquemes', 'RO', 'Estudante de Engenharia de Software, desenvolvedor Full-Stack apaixonado por TypeScript, React e Python. Past Mestre Conselheiro do Cap. Ariquemes.', '(69) 99345-0011', TRUE, 'https://linkedin.com/in/pedro-henrique-demo', 'https://github.com/pedro-demo'),
+  ('m0000000-0000-0000-0000-000000000001', 'carlos.silva@silvatech.com.br', 'Carlos Eduardo da Silva', 'mason', 'approved', TRUE, 'Ariquemes', 'RO', 'Empresário do setor de tecnologia, diretor da Silva Tecnologia e entusiasta do desenvolvimento dos jovens DeMolays.', '(69) 99234-5678', TRUE, 'https://linkedin.com/in/carlos-silva-demo', NULL),
+  ('a0000000-0000-0000-0000-000000000001', 'admin@linkmolay.com.br', 'Administrador LinkMolay', 'admin', 'approved', TRUE, 'Brasília', 'DF', 'Coordenação Geral da Plataforma LinkMolay e moderação institucional.', NULL, FALSE, NULL, NULL)
+ON CONFLICT (id) DO UPDATE SET
+  full_name = EXCLUDED.full_name,
+  role = EXCLUDED.role,
+  status = EXCLUDED.status,
+  verified = EXCLUDED.verified;
+
+SELECT 'LINKMOLAY: Storage e Perfis configurados com sucesso para acesso sincronizado entre dispositivos!' AS status;
