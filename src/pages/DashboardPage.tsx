@@ -30,7 +30,11 @@ import {
   GraduationCap,
   Award,
   BookOpen,
+  Upload,
+  X,
+  Loader2,
 } from 'lucide-react';
+import { uploadImageFile } from '../services/imageUpload';
 
 export const DashboardPage: React.FC = () => {
   const { currentUser, role, isDeMolay, isMason, refreshUser } = useAuth();
@@ -47,6 +51,24 @@ export const DashboardPage: React.FC = () => {
   const [newPostImage, setNewPostImage] = useState('');
   const [showImageInput, setShowImageInput] = useState(false);
   const [isSubmittingPost, setIsSubmittingPost] = useState(false);
+  const [isUploadingPostImage, setIsUploadingPostImage] = useState(false);
+  const postFileInputRef = React.useRef<HTMLInputElement>(null);
+
+  const handlePostFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    try {
+      setIsUploadingPostImage(true);
+      const uploadedUrl = await uploadImageFile(file, 'company-assets', 'banner');
+      setNewPostImage(uploadedUrl);
+      setShowImageInput(true);
+    } catch (err) {
+      alert('Erro ao carregar imagem para o post.');
+    } finally {
+      setIsUploadingPostImage(false);
+    }
+  };
 
   // Feed filter tab
   const [feedFilter, setFeedFilter] = useState<'all' | 'conquista' | 'projeto_capitulo' | 'vaga'>('all');
@@ -270,14 +292,46 @@ export const DashboardPage: React.FC = () => {
                 className="w-full resize-none rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-[#070D1E] p-3 text-sm text-slate-900 dark:text-white placeholder:text-slate-400 focus:border-amber-400 focus:outline-none focus:ring-1 focus:ring-amber-400/30"
               />
 
-              {showImageInput && (
-                <input
-                  type="url"
-                  value={newPostImage}
-                  onChange={(e) => setNewPostImage(e.target.value)}
-                  placeholder="URL da imagem (ex: https://images.unsplash.com/...)"
-                  className="w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-[#070D1E] px-3 py-2 text-xs text-slate-900 dark:text-white placeholder:text-slate-400 focus:border-amber-400 focus:outline-none"
-                />
+              <input
+                type="file"
+                ref={postFileInputRef}
+                onChange={handlePostFileUpload}
+                accept="image/png, image/jpeg, image/webp, image/gif"
+                className="hidden"
+              />
+
+              {/* Preview da Imagem Anexada */}
+              {newPostImage && (
+                <div className="relative rounded-xl overflow-hidden border border-amber-400/40 bg-[#070D1E] p-1.5 max-w-sm">
+                  <img
+                    src={newPostImage}
+                    alt="Preview do anexo"
+                    className="w-full h-36 object-cover rounded-lg"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setNewPostImage('');
+                      setShowImageInput(false);
+                    }}
+                    className="absolute top-3 right-3 flex h-6 w-6 items-center justify-center rounded-full bg-black/80 hover:bg-red-600 text-white text-xs cursor-pointer shadow-md transition-colors"
+                    title="Remover foto"
+                  >
+                    <X className="h-3.5 w-3.5" />
+                  </button>
+                </div>
+              )}
+
+              {showImageInput && !newPostImage && (
+                <div className="flex gap-2">
+                  <input
+                    type="url"
+                    value={newPostImage}
+                    onChange={(e) => setNewPostImage(e.target.value)}
+                    placeholder="Ou cole uma URL direta de imagem..."
+                    className="flex-1 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-[#070D1E] px-3 py-2 text-xs text-slate-900 dark:text-white placeholder:text-slate-400 focus:border-amber-400 focus:outline-none"
+                  />
+                </div>
               )}
 
               <div className="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-slate-100 dark:border-slate-800">
@@ -298,11 +352,16 @@ export const DashboardPage: React.FC = () => {
                     type="button"
                     variant="ghost"
                     size="sm"
-                    onClick={() => setShowImageInput(!showImageInput)}
-                    className="text-xs gap-1.5 text-slate-600 dark:text-slate-300"
+                    onClick={() => postFileInputRef.current?.click()}
+                    disabled={isUploadingPostImage}
+                    className="text-xs gap-1.5 text-slate-600 dark:text-slate-300 cursor-pointer"
                   >
-                    <ImageIcon className="h-4 w-4 text-amber-500" />
-                    Foto
+                    {isUploadingPostImage ? (
+                      <Loader2 className="h-4 w-4 text-amber-500 animate-spin" />
+                    ) : (
+                      <ImageIcon className="h-4 w-4 text-amber-500" />
+                    )}
+                    {newPostImage ? 'Trocar Foto' : 'Anexar Foto'}
                   </Button>
                 </div>
 
@@ -310,7 +369,7 @@ export const DashboardPage: React.FC = () => {
                   type="submit"
                   variant="gold"
                   size="sm"
-                  disabled={!newPostContent.trim() || isSubmittingPost}
+                  disabled={!newPostContent.trim() || isSubmittingPost || isUploadingPostImage}
                   className="gap-2 text-xs"
                 >
                   <Send className="h-3.5 w-3.5" />

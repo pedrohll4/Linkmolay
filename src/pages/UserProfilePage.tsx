@@ -115,8 +115,17 @@ export const UserProfilePage: React.FC = () => {
 
       {/* 1. CREDENCIAL FRATERNAL EXECUTIVA */}
       <div className="relative overflow-hidden rounded-3xl border border-amber-400/25 bg-gradient-to-br from-[#070D1E] via-[#0E162E] to-[#0A1124] text-white shadow-2xl">
-        <div className="h-44 sm:h-56 bg-gradient-to-r from-[#070D1E] via-[#101B3D] to-[#0A1124] relative border-b border-amber-400/15">
-          <div className="absolute inset-0 opacity-10 bg-[radial-gradient(#d4af37_1px,transparent_1px)] [background-size:16px_16px]" />
+        <div className="h-48 sm:h-64 relative border-b border-amber-400/15 overflow-hidden bg-[#070D1E]">
+          {profile.bannerUrl ? (
+            <img
+              src={profile.bannerUrl}
+              alt="Capa de perfil"
+              className="w-full h-full object-cover"
+            />
+          ) : (
+            <div className="w-full h-full bg-gradient-to-r from-[#070D1E] via-[#101B3D] to-[#0A1124]" />
+          )}
+          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/30 pointer-events-none" />
         </div>
 
         <div className="px-6 sm:px-8 pb-8 pt-0 relative">

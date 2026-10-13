@@ -36,6 +36,7 @@ export interface BaseProfile {
   status: UserStatus;
   verified: boolean;
   avatarUrl?: string;
+  bannerUrl?: string;
   bio?: string;
   city: string;
   state: string;

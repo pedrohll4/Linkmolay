@@ -3,6 +3,7 @@ import { useAuth } from '../context/AuthContext';
 import { api } from '../services/api';
 import { VerifiedBadge, OpenToWorkBadge } from '../components/common/Badges';
 import { LinkedinIcon, GithubIcon, InstagramIcon } from '../components/common/SocialIcons';
+import { ImageUploadModal } from '../components/common/ImageUploadModal';
 import { Experience, Education, Project } from '../types';
 import { Card, CardHeader, CardTitle, CardContent } from '../components/ui/card';
 import { Button } from '../components/ui/button';
@@ -33,6 +34,8 @@ import {
   BookOpen,
   ArrowRight,
   Download,
+  Camera,
+  ImageIcon,
 } from 'lucide-react';
 
 const AVAILABLE_INTEREST_AREAS = [
@@ -57,6 +60,13 @@ export const MyProfilePage: React.FC = () => {
 
   const [isEditing, setIsEditing] = useState(false);
   const [savedSuccess, setSavedSuccess] = useState(false);
+  const [successMessage, setSuccessMessage] = useState('Perfil atualizado com sucesso!');
+
+  // Image Upload Modals State
+  const [avatarUrl, setAvatarUrl] = useState(currentUser?.avatarUrl || '');
+  const [bannerUrl, setBannerUrl] = useState(currentUser?.bannerUrl || '');
+  const [isAvatarModalOpen, setIsAvatarModalOpen] = useState(false);
+  const [isBannerModalOpen, setIsBannerModalOpen] = useState(false);
 
   // Form states
   const [fullName, setFullName] = useState(currentUser?.fullName || '');
@@ -95,6 +105,26 @@ export const MyProfilePage: React.FC = () => {
 
   if (!currentUser) return null;
 
+  const showNotification = (msg: string) => {
+    setSuccessMessage(msg);
+    setSavedSuccess(true);
+    setTimeout(() => setSavedSuccess(false), 3000);
+  };
+
+  const handleSaveAvatar = (newUrl: string) => {
+    setAvatarUrl(newUrl);
+    api.updateProfile(currentUser.id, { avatarUrl: newUrl });
+    refreshUser();
+    showNotification('Foto de perfil atualizada com sucesso!');
+  };
+
+  const handleSaveBanner = (newUrl: string) => {
+    setBannerUrl(newUrl);
+    api.updateProfile(currentUser.id, { bannerUrl: newUrl });
+    refreshUser();
+    showNotification('Capa de perfil atualizada com sucesso!');
+  };
+
   const handleSaveProfile = (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -111,6 +141,8 @@ export const MyProfilePage: React.FC = () => {
       portfolioUrl,
       resumeUrl,
       experiences,
+      avatarUrl,
+      bannerUrl,
     };
 
     if (isDeMolay) {
@@ -132,8 +164,7 @@ export const MyProfilePage: React.FC = () => {
     api.updateProfile(currentUser.id, updates);
     refreshUser();
     setIsEditing(false);
-    setSavedSuccess(true);
-    setTimeout(() => setSavedSuccess(false), 3000);
+    showNotification('Perfil atualizado com sucesso!');
   };
 
   const toggleInterestArea = (area: string) => {
@@ -203,16 +234,40 @@ export const MyProfilePage: React.FC = () => {
     <div className="max-w-5xl mx-auto space-y-8 animate-in fade-in duration-300">
       {savedSuccess && (
         <div className="p-4 rounded-xl bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 text-sm flex items-center gap-2 shadow-md">
-          <Check className="w-5 h-5" /> Perfil atualizado com sucesso!
+          <Check className="w-5 h-5" /> {successMessage}
         </div>
       )}
 
       {/* 1. CARTÃO EXECUTIVO / CREDENCIAL FRATERNAL DE MEMBRO */}
       <div className="relative overflow-hidden rounded-3xl border border-amber-400/25 bg-gradient-to-br from-[#070D1E] via-[#0E162E] to-[#0A1124] text-white shadow-2xl">
-        {/* Banner de Fundo Decorativo com Brasão em Marca D'água */}
-        <div className="h-44 sm:h-56 bg-gradient-to-r from-[#070D1E] via-[#101B3D] to-[#0A1124] relative border-b border-amber-400/15">
-          <div className="absolute inset-0 opacity-10 bg-[radial-gradient(#d4af37_1px,transparent_1px)] [background-size:16px_16px]" />
-          <div className="absolute top-4 right-4 flex items-center gap-2 z-10">
+        {/* Banner de Fundo com Foto Personalizada ou Padrão Nobre */}
+        <div className="h-48 sm:h-64 relative border-b border-amber-400/15 overflow-hidden bg-[#070D1E]">
+          {bannerUrl ? (
+            <img
+              src={bannerUrl}
+              alt="Capa de perfil"
+              className="w-full h-full object-cover"
+            />
+          ) : (
+            <div className="w-full h-full bg-gradient-to-r from-[#070D1E] via-[#101B3D] to-[#0A1124]" />
+          )}
+
+          {/* Sombra sutil para legibilidade */}
+          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/30 pointer-events-none" />
+
+          {/* Botões do Topo da Capa */}
+          <div className="absolute top-4 right-4 flex items-center gap-2.5 z-10">
+            {/* Botão de Alterar Capa */}
+            <Button
+              variant="secondary"
+              size="sm"
+              onClick={() => setIsBannerModalOpen(true)}
+              className="gap-1.5 text-xs bg-slate-900/85 hover:bg-slate-900 text-white border border-amber-400/40 backdrop-blur-md shadow-lg cursor-pointer"
+            >
+              <Camera className="w-3.5 h-3.5 text-amber-400" />
+              <span>Alterar Capa</span>
+            </Button>
+
             {!isEditing ? (
               <Button
                 variant="goldOutline"
@@ -239,17 +294,29 @@ export const MyProfilePage: React.FC = () => {
         <div className="px-6 sm:px-8 pb-8 pt-0 relative">
           <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-6 -mt-20 sm:-mt-24 mb-6">
             <div className="flex items-end gap-5">
-              {/* Avatar com Anel Dourado */}
-              <Avatar
-                size="xl"
-                withRing
-                className="h-28 w-28 sm:h-36 sm:w-36 border-4 border-[#070D1E] bg-[#0E162E] shadow-2xl shrink-0"
-              >
-                <AvatarImage src={currentUser.avatarUrl || ''} alt={currentUser.fullName} />
-                <AvatarFallback className="text-3xl font-serif text-amber-300">
-                  {currentUser.fullName.slice(0, 2).toUpperCase()}
-                </AvatarFallback>
-              </Avatar>
+              {/* Avatar com Botão de Upload Direto */}
+              <div className="relative group shrink-0">
+                <Avatar
+                  size="xl"
+                  withRing
+                  className="h-28 w-28 sm:h-36 sm:w-36 border-4 border-[#070D1E] bg-[#0E162E] shadow-2xl overflow-hidden"
+                >
+                  <AvatarImage src={avatarUrl || ''} alt={currentUser.fullName} />
+                  <AvatarFallback className="text-3xl font-serif text-amber-300">
+                    {currentUser.fullName.slice(0, 2).toUpperCase()}
+                  </AvatarFallback>
+                </Avatar>
+
+                {/* Botão Flutuante de Alterar Foto de Perfil */}
+                <button
+                  type="button"
+                  onClick={() => setIsAvatarModalOpen(true)}
+                  className="absolute bottom-1 right-1 flex h-9 w-9 items-center justify-center rounded-full bg-amber-400 hover:bg-amber-300 text-slate-950 shadow-xl border-2 border-[#070D1E] transition-transform hover:scale-110 cursor-pointer"
+                  title="Alterar foto de perfil"
+                >
+                  <Camera className="h-4 w-4" />
+                </button>
+              </div>
 
               <div className="mb-2">
                 <div className="flex items-center gap-2 flex-wrap">
@@ -415,6 +482,33 @@ export const MyProfilePage: React.FC = () => {
               </div>
             </div>
 
+            {/* Atalhos Rápidos para Trocar Imagens no Modo de Edição */}
+            <div className="p-4 rounded-xl border border-amber-400/20 bg-[#070D1E]/60 flex flex-wrap items-center justify-between gap-3">
+              <span className="text-xs text-slate-300">
+                Deseja alterar suas fotos? Você pode selecionar qualquer arquivo do seu dispositivo ou escolher capas na galeria.
+              </span>
+              <div className="flex gap-2">
+                <Button
+                  type="button"
+                  variant="secondary"
+                  size="sm"
+                  onClick={() => setIsAvatarModalOpen(true)}
+                  className="text-xs gap-1.5"
+                >
+                  <Camera className="h-3.5 w-3.5 text-amber-400" /> Foto de Perfil
+                </Button>
+                <Button
+                  type="button"
+                  variant="secondary"
+                  size="sm"
+                  onClick={() => setIsBannerModalOpen(true)}
+                  className="text-xs gap-1.5"
+                >
+                  <ImageIcon className="h-3.5 w-3.5 text-amber-400" /> Capa de Fundo
+                </Button>
+              </div>
+            </div>
+
             {/* Dados Pessoais */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               <div>
@@ -560,7 +654,6 @@ export const MyProfilePage: React.FC = () => {
 
         {/* ABA 1: VISÃO GERAL */}
         <TabsContent value="visao_geral" className="space-y-6">
-          {/* Card Sobre Mim */}
           <Card variant="default">
             <CardHeader className="pb-3 border-b border-slate-200/60 dark:border-slate-800">
               <CardTitle className="text-base font-serif flex items-center gap-2">
@@ -576,7 +669,6 @@ export const MyProfilePage: React.FC = () => {
             </CardContent>
           </Card>
 
-          {/* Áreas de Interesse Selecionadas */}
           {isDeMolay && interestAreas.length > 0 && (
             <Card variant="default">
               <CardHeader className="pb-3 border-b border-slate-200/60 dark:border-slate-800">
@@ -747,6 +839,25 @@ export const MyProfilePage: React.FC = () => {
           </Card>
         </TabsContent>
       </Tabs>
+
+      {/* 4. MODAIS DE UPLOAD DE IMAGEM */}
+      <ImageUploadModal
+        isOpen={isAvatarModalOpen}
+        onClose={() => setIsAvatarModalOpen(false)}
+        onSave={handleSaveAvatar}
+        title="Alterar Foto de Perfil"
+        type="avatar"
+        currentImage={avatarUrl}
+      />
+
+      <ImageUploadModal
+        isOpen={isBannerModalOpen}
+        onClose={() => setIsBannerModalOpen(false)}
+        onSave={handleSaveBanner}
+        title="Alterar Capa do Perfil"
+        type="banner"
+        currentImage={bannerUrl}
+      />
     </div>
   );
 };
