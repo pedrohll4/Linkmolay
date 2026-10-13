@@ -83,7 +83,7 @@ export const LandingPage: React.FC = () => {
 
           <p className="text-lg sm:text-xl text-slate-600 dark:text-slate-300 max-w-2xl mx-auto mb-10 leading-relaxed font-normal">
             Uma rede profissional exclusiva para DeMolays e Maçons, criada para conectar
-            jovens líderes a oportunidades de carreira oferecidas por Maçons e empresas parceiras.
+            jovens líderes a oportunidades oferecidas por empresários da família maçônica e empresas parceiras.
           </p>
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
