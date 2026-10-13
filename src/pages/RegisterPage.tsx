@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { UserRole } from '../types';
+import { UserRole, Chapter } from '../types';
+import { api } from '../services/api';
 import confetti from 'canvas-confetti';
 import {
   ShieldAlert,
@@ -30,8 +31,12 @@ export const RegisterPage: React.FC = () => {
   const [city, setCity] = useState('Ariquemes');
   const [state, setState] = useState('RO');
 
+  // Capítulos cadastrados
+  const [chapters, setChapters] = useState<Chapter[]>([]);
+  const [selectedChapterId, setSelectedChapterId] = useState<string>('');
+  const [customChapterName, setCustomChapterName] = useState<string>('');
+
   // DeMolay fields
-  const [chapterName, setChapterName] = useState('Capítulo Luciano de Assis nº 118');
   const [orderRank, setOrderRank] = useState('DeMolay Ativo');
   const [cid, setCid] = useState('');
 
@@ -44,10 +49,37 @@ export const RegisterPage: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
+  useEffect(() => {
+    const list = api.getChapters();
+    setChapters(list);
+    if (list.length > 0) {
+      const def = list.find((c) => c.name.includes('Luciano de Assis')) || list[0];
+      setSelectedChapterId(def.id);
+    } else {
+      setSelectedChapterId('outro');
+    }
+  }, []);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
     setLoading(true);
+
+    let finalChapterName = '';
+    if (role === 'demolay') {
+      if (selectedChapterId === 'outro') {
+        finalChapterName = customChapterName.trim();
+      } else {
+        const found = chapters.find((c) => c.id === selectedChapterId);
+        finalChapterName = found ? `${found.name} nº ${found.number}` : customChapterName.trim();
+      }
+
+      if (!finalChapterName) {
+        setError('Por favor, informe ou selecione o seu Capítulo DeMolay.');
+        setLoading(false);
+        return;
+      }
+    }
 
     try {
       const res = await register({
@@ -57,7 +89,7 @@ export const RegisterPage: React.FC = () => {
         city,
         state,
         phone,
-        chapterName: role === 'demolay' ? chapterName : undefined,
+        chapterName: role === 'demolay' ? finalChapterName : undefined,
         orderRank: role === 'demolay' ? orderRank : undefined,
         cid: role === 'demolay' ? cid : undefined,
         lodgeName: role === 'mason' ? lodgeName : undefined,
@@ -247,17 +279,47 @@ export const RegisterPage: React.FC = () => {
                     Capítulo DeMolay *
                   </label>
                   <div className="relative">
-                    <Landmark className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
-                    <input
-                      type="text"
-                      required
-                      placeholder="Ex: Capítulo Luciano de Assis nº 118"
-                      value={chapterName}
-                      onChange={(e) => setChapterName(e.target.value)}
-                      className="w-full pl-10 pr-3 py-2 text-xs rounded-xl border border-slate-200 dark:border-navy-800 bg-slate-50 dark:bg-navy-950 text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-1 focus:ring-gold-500"
-                    />
+                    <Landmark className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                    <select
+                      value={selectedChapterId}
+                      onChange={(e) => setSelectedChapterId(e.target.value)}
+                      className="w-full pl-10 pr-8 py-2 text-xs rounded-xl border border-slate-200 dark:border-navy-800 bg-slate-50 dark:bg-navy-950 text-slate-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-gold-500 cursor-pointer"
+                    >
+                      {chapters.map((chap) => (
+                        <option key={chap.id} value={chap.id}>
+                          {chap.name} nº {chap.number} ({chap.city} - {chap.state})
+                        </option>
+                      ))}
+                      <option value="outro">✍️ Outro Capítulo (não listado / novo)</option>
+                    </select>
                   </div>
                 </div>
+
+                {/* Campo aberto caso selecione "Outro Capítulo" */}
+                {selectedChapterId === 'outro' && (
+                  <div className="p-3.5 rounded-xl bg-amber-500/10 border border-amber-500/20 space-y-2 animate-in fade-in duration-200">
+                    <div className="flex items-center justify-between">
+                      <label className="block text-[11px] font-bold text-amber-500 uppercase tracking-wider">
+                        Informe o nome e número do seu Capítulo *
+                      </label>
+                      <span className="text-[10px] text-amber-400 font-semibold">Novo Capítulo</span>
+                    </div>
+                    <div className="relative">
+                      <Landmark className="w-3.5 h-3.5 text-amber-500 absolute left-3 top-1/2 -translate-y-1/2" />
+                      <input
+                        type="text"
+                        required
+                        placeholder="Ex: Capítulo Cavaleiros do Guaporé nº 340"
+                        value={customChapterName}
+                        onChange={(e) => setCustomChapterName(e.target.value)}
+                        className="w-full pl-9 pr-3 py-2 text-xs rounded-lg border border-amber-500/30 bg-white dark:bg-navy-900 text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-1 focus:ring-amber-500"
+                      />
+                    </div>
+                    <p className="text-[10px] text-slate-400 leading-relaxed">
+                      Seu capítulo ficará registrado e o Administrador poderá homologá-lo oficialmente no sistema durante a aprovação do seu perfil.
+                    </p>
+                  </div>
+                )}
 
                 <div className="grid grid-cols-2 gap-3">
                   <div>

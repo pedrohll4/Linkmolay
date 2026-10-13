@@ -572,7 +572,82 @@ export const api = {
     };
     chapters.push(newChapter);
     saveToStorage(KEYS.CHAPTERS, chapters);
+
+    if (isSupabaseConfigured && supabase) {
+      supabase.from('chapters').upsert({
+        id: newChapter.id,
+        name: newChapter.name,
+        number: newChapter.number,
+        city: newChapter.city,
+        state: newChapter.state,
+        logo_url: newChapter.logoUrl,
+        banner_url: newChapter.bannerUrl,
+        history: newChapter.history,
+        master_councilor: newChapter.masterCouncilor,
+        contact_email: newChapter.contactEmail,
+        contact_phone: newChapter.contactPhone,
+        instagram: newChapter.instagram,
+        active_members_count: newChapter.activeMembersCount || 0,
+      }).then(() => {}, () => {});
+    }
+
     return newChapter;
+  },
+
+  updateChapter(id: string, updates: Partial<Chapter>): Chapter {
+    const chapters = this.getChapters();
+    const index = chapters.findIndex((c) => c.id === id);
+    if (index === -1) throw new Error('Capítulo não encontrado');
+
+    const updated = { ...chapters[index], ...updates };
+    chapters[index] = updated;
+    saveToStorage(KEYS.CHAPTERS, chapters);
+
+    if (isSupabaseConfigured && supabase) {
+      supabase.from('chapters').upsert({
+        id: updated.id,
+        name: updated.name,
+        number: updated.number,
+        city: updated.city,
+        state: updated.state,
+        logo_url: updated.logoUrl,
+        banner_url: updated.bannerUrl,
+        history: updated.history,
+        master_councilor: updated.masterCouncilor,
+        contact_email: updated.contactEmail,
+        contact_phone: updated.contactPhone,
+        instagram: updated.instagram,
+        active_members_count: updated.activeMembersCount || 0,
+      }).then(() => {}, () => {});
+    }
+
+    return updated;
+  },
+
+  deleteChapter(id: string): void {
+    const chapters = this.getChapters().filter((c) => c.id !== id);
+    saveToStorage(KEYS.CHAPTERS, chapters);
+
+    if (isSupabaseConfigured && supabase) {
+      supabase.from('chapters').delete().eq('id', id).then(() => {}, () => {});
+    }
+  },
+
+  updateUserChapter(userId: string, chapterId: string | undefined, chapterName: string): UserProfile {
+    const user = this.getUserById(userId);
+    if (!user) throw new Error('Usuário não encontrado');
+
+    if (user.role === 'demolay' && user.demolayDetails) {
+      return this.updateProfile(userId, {
+        demolayDetails: {
+          ...user.demolayDetails,
+          chapterId,
+          chapterName,
+        },
+      });
+    }
+
+    return user;
   },
 
   // --------------------------------------------------------------------------

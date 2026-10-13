@@ -27,6 +27,12 @@ import {
   Check,
   Trash2,
   Lock,
+  Plus,
+  Edit2,
+  X,
+  Phone,
+  Mail,
+  Globe,
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 
@@ -34,21 +40,43 @@ export const AdminDashboardPage: React.FC = () => {
   const { currentUser, isAdmin } = useAuth();
 
   const [stats, setStats] = useState<SystemStats | null>(null);
-  const [activeTab, setActiveTab] = useState<'pending' | 'users' | 'jobs' | 'audit'>('pending');
+  const [activeTab, setActiveTab] = useState<'pending' | 'users' | 'chapters' | 'jobs' | 'audit'>('pending');
 
   const [pendingUsers, setPendingUsers] = useState<UserProfile[]>([]);
   const [allUsers, setAllUsers] = useState<UserProfile[]>([]);
   const [allJobs, setAllJobs] = useState<Job[]>([]);
+  const [allChapters, setAllChapters] = useState<Chapter[]>([]);
   const [auditActions, setAuditActions] = useState<AdminAction[]>([]);
 
   const [userSearch, setUserSearch] = useState('');
   const [actionSuccessMsg, setActionSuccessMsg] = useState<string | null>(null);
+
+  // Estados do Modal de Criação / Edição de Capítulo
+  const [isChapterModalOpen, setIsChapterModalOpen] = useState(false);
+  const [editingChapter, setEditingChapter] = useState<Chapter | null>(null);
+  const [chapName, setChapName] = useState('');
+  const [chapNumber, setChapNumber] = useState<number | ''>('');
+  const [chapCity, setChapCity] = useState('');
+  const [chapState, setChapState] = useState('RO');
+  const [chapLogo, setChapLogo] = useState('');
+  const [chapMaster, setChapMaster] = useState('');
+  const [chapEmail, setChapEmail] = useState('');
+  const [chapPhone, setChapPhone] = useState('');
+  const [chapInstagram, setChapInstagram] = useState('');
+  const [chapHistory, setChapHistory] = useState('');
+
+  // Estados do Modal de Alteração de Capítulo de Membro
+  const [userChapterModalOpen, setUserChapterModalOpen] = useState(false);
+  const [targetUser, setTargetUser] = useState<UserProfile | null>(null);
+  const [targetChapterSelect, setTargetChapterSelect] = useState<string>('');
+  const [targetCustomChapterName, setTargetCustomChapterName] = useState<string>('');
 
   const loadData = () => {
     setStats(api.getStats());
     setPendingUsers(api.getPendingUsers());
     setAllUsers(api.getUsers());
     setAllJobs(api.getJobs());
+    setAllChapters(api.getChapters());
     setAuditActions(api.getAdminActions());
   };
 
@@ -110,6 +138,141 @@ export const AdminDashboardPage: React.FC = () => {
 
   const handleCloseJob = (jobId: string) => {
     api.updateJobStatus(jobId, 'encerrada');
+    loadData();
+  };
+
+  // Funções de Gestão de Capítulos
+  const openNewChapterModal = () => {
+    setEditingChapter(null);
+    setChapName('');
+    setChapNumber('');
+    setChapCity('Ariquemes');
+    setChapState('RO');
+    setChapLogo('/chapters/luciano-de-assis-118.png');
+    setChapMaster('');
+    setChapEmail('');
+    setChapPhone('');
+    setChapInstagram('');
+    setChapHistory('');
+    setIsChapterModalOpen(true);
+  };
+
+  const openEditChapterModal = (c: Chapter) => {
+    setEditingChapter(c);
+    setChapName(c.name);
+    setChapNumber(c.number);
+    setChapCity(c.city);
+    setChapState(c.state);
+    setChapLogo(c.logoUrl || '');
+    setChapMaster(c.masterCouncilor || '');
+    setChapEmail(c.contactEmail || '');
+    setChapPhone(c.contactPhone || '');
+    setChapInstagram(c.instagram || '');
+    setChapHistory(c.history || '');
+    setIsChapterModalOpen(true);
+  };
+
+  const handleSaveChapter = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!chapName.trim() || !chapNumber) {
+      alert('Preencha o nome e o número do capítulo.');
+      return;
+    }
+
+    if (editingChapter) {
+      api.updateChapter(editingChapter.id, {
+        name: chapName.trim(),
+        number: Number(chapNumber),
+        city: chapCity.trim(),
+        state: chapState.trim().toUpperCase(),
+        logoUrl: chapLogo.trim() || undefined,
+        masterCouncilor: chapMaster.trim() || undefined,
+        contactEmail: chapEmail.trim() || undefined,
+        contactPhone: chapPhone.trim() || undefined,
+        instagram: chapInstagram.trim() || undefined,
+        history: chapHistory.trim() || undefined,
+      });
+      setActionSuccessMsg('Capítulo atualizado com sucesso!');
+    } else {
+      api.createChapter({
+        name: chapName.trim(),
+        number: Number(chapNumber),
+        city: chapCity.trim(),
+        state: chapState.trim().toUpperCase(),
+        logoUrl: chapLogo.trim() || '/chapters/luciano-de-assis-118.png',
+        bannerUrl: 'https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?auto=format&fit=crop&w=1200&q=80',
+        masterCouncilor: chapMaster.trim() || undefined,
+        contactEmail: chapEmail.trim() || undefined,
+        contactPhone: chapPhone.trim() || undefined,
+        instagram: chapInstagram.trim() || undefined,
+        history: chapHistory.trim() || undefined,
+        activeMembersCount: 0,
+      });
+      setActionSuccessMsg('Novo Capítulo cadastrado e disponível na tela de registro!');
+    }
+
+    setIsChapterModalOpen(false);
+    setTimeout(() => setActionSuccessMsg(null), 3000);
+    loadData();
+  };
+
+  const handleDeleteChapter = (c: Chapter) => {
+    if (confirm(`Deseja realmente excluir o ${c.name} nº ${c.number}?`)) {
+      api.deleteChapter(c.id);
+      setActionSuccessMsg(`Capítulo ${c.name} excluído.`);
+      setTimeout(() => setActionSuccessMsg(null), 3000);
+      loadData();
+    }
+  };
+
+  // Funções de Alteração de Capítulo do Usuário
+  const openUserChapterModal = (user: UserProfile) => {
+    setTargetUser(user);
+    const userChap = user.demolayDetails?.chapterName || '';
+    const match = allChapters.find(
+      (c) =>
+        c.id === user.demolayDetails?.chapterId ||
+        userChap.toLowerCase().includes(c.name.toLowerCase())
+    );
+
+    if (match) {
+      setTargetChapterSelect(match.id);
+      setTargetCustomChapterName('');
+    } else {
+      setTargetChapterSelect('custom');
+      setTargetCustomChapterName(userChap);
+    }
+    setUserChapterModalOpen(true);
+  };
+
+  const handleSaveUserChapter = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!targetUser) return;
+
+    let finalName = '';
+    let finalId: string | undefined = undefined;
+
+    if (targetChapterSelect === 'custom') {
+      finalName = targetCustomChapterName.trim();
+    } else {
+      const found = allChapters.find((c) => c.id === targetChapterSelect);
+      if (found) {
+        finalName = `${found.name} nº ${found.number}`;
+        finalId = found.id;
+      } else {
+        finalName = targetCustomChapterName.trim();
+      }
+    }
+
+    if (!finalName) {
+      alert('Informe o nome do capítulo.');
+      return;
+    }
+
+    api.updateUserChapter(targetUser.id, finalId, finalName);
+    setActionSuccessMsg(`Capítulo de ${targetUser.fullName} atualizado para "${finalName}"!`);
+    setUserChapterModalOpen(false);
+    setTimeout(() => setActionSuccessMsg(null), 3500);
     loadData();
   };
 
@@ -227,6 +390,21 @@ export const AdminDashboardPage: React.FC = () => {
         </button>
 
         <button
+          onClick={() => setActiveTab('chapters')}
+          className={`pb-3 flex items-center gap-1.5 transition-all ${
+            activeTab === 'chapters'
+              ? 'text-yellow-500 font-bold border-b-2 border-yellow-500'
+              : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'
+          }`}
+        >
+          <Landmark className="w-3.5 h-3.5 text-yellow-500" />
+          <span>Capítulos</span>
+          <span className="px-2 py-0.5 rounded-full text-[10px] bg-slate-200 dark:bg-navy-800 text-slate-700 dark:text-slate-300 font-bold">
+            {allChapters.length}
+          </span>
+        </button>
+
+        <button
           onClick={() => setActiveTab('jobs')}
           className={`pb-3 transition-all ${
             activeTab === 'jobs'
@@ -313,10 +491,20 @@ export const AdminDashboardPage: React.FC = () => {
                     {user.role === 'demolay' ? (
                       <>
                         <div>
-                          <span className="text-slate-400 block">Capítulo Informado:</span>
-                          <strong className="text-slate-800 dark:text-slate-200">
-                            {user.demolayDetails?.chapterName}
-                          </strong>
+                          <span className="text-slate-400 block mb-0.5">Capítulo Informado:</span>
+                          <div className="flex items-center gap-2">
+                            <strong className="text-slate-800 dark:text-slate-200">
+                              {user.demolayDetails?.chapterName || 'Não informado'}
+                            </strong>
+                            <button
+                              type="button"
+                              onClick={() => openUserChapterModal(user)}
+                              className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-bold bg-amber-500/15 text-amber-500 hover:bg-amber-500/25 border border-amber-500/30 transition-colors cursor-pointer"
+                              title="Alterar ou vincular a um capítulo oficial"
+                            >
+                              <Edit2 className="w-2.5 h-2.5" /> Alterar
+                            </button>
+                          </div>
                         </div>
                         <div>
                           <span className="text-slate-400 block">Grau / Cargo:</span>
@@ -397,8 +585,28 @@ export const AdminDashboardPage: React.FC = () => {
                         </span>
                         <UserStatusBadge status={u.status} />
                       </div>
-                      <p className="text-[11px] text-slate-400">
-                        {u.email} • {u.city} - {u.state} • {u.role.toUpperCase()}
+                      <p className="text-[11px] text-slate-400 flex items-center gap-1.5 flex-wrap mt-0.5">
+                        <span>{u.email}</span>
+                        <span>•</span>
+                        <span>{u.city} - {u.state}</span>
+                        <span>•</span>
+                        <span className="uppercase font-semibold">{u.role}</span>
+                        {u.role === 'demolay' && (
+                          <>
+                            <span>•</span>
+                            <span className="text-amber-500 font-medium inline-flex items-center gap-1">
+                              <Landmark className="w-3 h-3 text-amber-500" />
+                              {u.demolayDetails?.chapterName || 'Sem capítulo'}
+                            </span>
+                            <button
+                              type="button"
+                              onClick={() => openUserChapterModal(u)}
+                              className="text-[10px] text-amber-500 hover:underline font-bold cursor-pointer ml-0.5"
+                            >
+                              [Alterar]
+                            </button>
+                          </>
+                        )}
                       </p>
                     </div>
                   </div>
@@ -425,6 +633,108 @@ export const AdminDashboardPage: React.FC = () => {
                 </div>
               ))}
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Tab: Gestão de Capítulos */}
+      {activeTab === 'chapters' && (
+        <div className="space-y-4">
+          <div className="p-5 rounded-3xl border border-slate-200/80 dark:border-navy-850 bg-white dark:bg-navy-900/60 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div>
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-8 rounded-xl bg-amber-500/10 text-amber-500 flex items-center justify-center">
+                  <Landmark className="w-4 h-4" />
+                </div>
+                <h3 className="font-serif text-base font-bold text-slate-900 dark:text-white">
+                  Capítulos da Ordem DeMolay Cadastrados
+                </h3>
+              </div>
+              <p className="text-xs text-slate-400 mt-1 max-w-xl">
+                Os capítulos cadastrados aqui ficam disponíveis para seleção instantânea na tela de registro. Você pode criar, editar dados de liderança e gerenciar os capítulos da rede.
+              </p>
+            </div>
+
+            <button
+              type="button"
+              onClick={openNewChapterModal}
+              className="px-4 py-2.5 rounded-xl text-xs font-bold bg-amber-500 hover:bg-amber-400 text-slate-950 transition-all flex items-center gap-2 shadow-sm shrink-0 cursor-pointer"
+            >
+              <Plus className="w-4 h-4" /> Cadastrar Novo Capítulo
+            </button>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {allChapters.map((chap) => (
+              <div
+                key={chap.id}
+                className="p-5 rounded-3xl border border-slate-200/80 dark:border-navy-850 bg-white dark:bg-navy-900/70 shadow-xs flex flex-col justify-between space-y-4 hover:border-amber-500/40 transition-all"
+              >
+                <div className="space-y-3">
+                  <div className="flex items-start gap-3.5">
+                    <div className="w-14 h-14 rounded-2xl overflow-hidden bg-navy-800 border border-amber-500/30 shrink-0 shadow-md">
+                      {chap.logoUrl ? (
+                        <img src={chap.logoUrl} alt={chap.name} className="w-full h-full object-cover" />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center font-bold text-amber-400 text-xs">
+                          {chap.name.slice(0, 2).toUpperCase()}
+                        </div>
+                      )}
+                    </div>
+                    <div>
+                      <h4 className="font-serif font-bold text-sm text-slate-900 dark:text-white leading-tight">
+                        {chap.name} nº {chap.number}
+                      </h4>
+                      <p className="text-xs text-slate-400 mt-0.5">
+                        📍 {chap.city} - {chap.state}
+                      </p>
+                      <span className="inline-block mt-1 px-2 py-0.5 rounded-md text-[10px] font-semibold bg-blue-500/10 text-blue-400 border border-blue-500/20">
+                        {chap.activeMembersCount || 0} membros ativos
+                      </span>
+                    </div>
+                  </div>
+
+                  {chap.history && (
+                    <p className="text-xs text-slate-500 dark:text-slate-400 line-clamp-2 leading-relaxed">
+                      {chap.history}
+                    </p>
+                  )}
+
+                  <div className="pt-2 border-t border-slate-100 dark:border-navy-850 text-[11px] text-slate-400 space-y-1">
+                    {chap.masterCouncilor && (
+                      <div>
+                        <span className="text-slate-500">Mestre Conselheiro: </span>
+                        <strong className="text-slate-700 dark:text-slate-200">{chap.masterCouncilor}</strong>
+                      </div>
+                    )}
+                    {chap.contactEmail && (
+                      <div className="truncate">
+                        <span className="text-slate-500">E-mail: </span>
+                        <span className="text-slate-700 dark:text-slate-200">{chap.contactEmail}</span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-2 pt-2 border-t border-slate-100 dark:border-navy-850">
+                  <button
+                    type="button"
+                    onClick={() => openEditChapterModal(chap)}
+                    className="flex-1 py-1.5 rounded-xl text-xs font-semibold bg-slate-100 hover:bg-slate-200 dark:bg-navy-800 dark:hover:bg-navy-750 text-slate-700 dark:text-slate-200 transition-colors flex items-center justify-center gap-1 cursor-pointer"
+                  >
+                    <Edit2 className="w-3.5 h-3.5" /> Editar
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => handleDeleteChapter(chap)}
+                    className="px-3 py-1.5 rounded-xl text-xs font-semibold bg-rose-500/10 hover:bg-rose-500/20 text-rose-500 transition-colors flex items-center justify-center gap-1 cursor-pointer"
+                    title="Excluir capítulo"
+                  >
+                    <Trash2 className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       )}
@@ -491,6 +801,266 @@ export const AdminDashboardPage: React.FC = () => {
                 </div>
               ))}
             </div>
+          </div>
+        </div>
+      )}
+      {/* MODAL 1: Cadastrar / Editar Capítulo */}
+      {isChapterModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 backdrop-blur-sm p-4 overflow-y-auto animate-in fade-in duration-200">
+          <div className="w-full max-w-xl rounded-3xl border border-amber-500/40 bg-[#0A1124] text-white p-6 shadow-2xl relative my-8">
+            <button
+              type="button"
+              onClick={() => setIsChapterModalOpen(false)}
+              className="absolute top-5 right-5 text-slate-400 hover:text-white p-1 text-lg font-bold cursor-pointer"
+            >
+              <X className="w-5 h-5" />
+            </button>
+
+            <div className="flex items-center gap-3 mb-5 pb-3 border-b border-amber-500/20">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-amber-400/15 text-amber-400">
+                <Landmark className="h-5 w-5" />
+              </div>
+              <div>
+                <h3 className="font-serif text-lg font-bold text-white">
+                  {editingChapter ? 'Editar Capítulo' : 'Novo Capítulo da Ordem DeMolay'}
+                </h3>
+                <p className="text-xs text-slate-400">
+                  Preencha os dados oficiais do capítulo para disponibilizá-lo na rede.
+                </p>
+              </div>
+            </div>
+
+            <form onSubmit={handleSaveChapter} className="space-y-4 text-xs">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div className="sm:col-span-2">
+                  <label className="block text-slate-300 font-semibold mb-1">Nome do Capítulo *</label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="Ex: Capítulo Luciano de Assis"
+                    value={chapName}
+                    onChange={(e) => setChapName(e.target.value)}
+                    className="w-full px-3 py-2 rounded-xl border border-slate-700 bg-slate-900/90 text-white placeholder:text-slate-500 focus:outline-none focus:border-amber-400"
+                  />
+                </div>
+                <div>
+                  <label className="block text-slate-300 font-semibold mb-1">Número *</label>
+                  <input
+                    type="number"
+                    required
+                    placeholder="118"
+                    value={chapNumber}
+                    onChange={(e) => setChapNumber(e.target.value === '' ? '' : Number(e.target.value))}
+                    className="w-full px-3 py-2 rounded-xl border border-slate-700 bg-slate-900/90 text-white placeholder:text-slate-500 focus:outline-none focus:border-amber-400"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div className="sm:col-span-2">
+                  <label className="block text-slate-300 font-semibold mb-1">Cidade *</label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="Ex: Ariquemes"
+                    value={chapCity}
+                    onChange={(e) => setChapCity(e.target.value)}
+                    className="w-full px-3 py-2 rounded-xl border border-slate-700 bg-slate-900/90 text-white placeholder:text-slate-500 focus:outline-none focus:border-amber-400"
+                  />
+                </div>
+                <div>
+                  <label className="block text-slate-300 font-semibold mb-1">Estado (UF) *</label>
+                  <input
+                    type="text"
+                    required
+                    maxLength={2}
+                    placeholder="RO"
+                    value={chapState}
+                    onChange={(e) => setChapState(e.target.value.toUpperCase())}
+                    className="w-full px-3 py-2 rounded-xl border border-slate-700 bg-slate-900/90 text-white uppercase text-center font-bold focus:outline-none focus:border-amber-400"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-slate-300 font-semibold mb-1">Mestre Conselheiro</label>
+                  <input
+                    type="text"
+                    placeholder="Nome do líder atual"
+                    value={chapMaster}
+                    onChange={(e) => setChapMaster(e.target.value)}
+                    className="w-full px-3 py-2 rounded-xl border border-slate-700 bg-slate-900/90 text-white placeholder:text-slate-500 focus:outline-none focus:border-amber-400"
+                  />
+                </div>
+                <div>
+                  <label className="block text-slate-300 font-semibold mb-1">E-mail de Contato</label>
+                  <input
+                    type="email"
+                    placeholder="capitulo@demolay.org.br"
+                    value={chapEmail}
+                    onChange={(e) => setChapEmail(e.target.value)}
+                    className="w-full px-3 py-2 rounded-xl border border-slate-700 bg-slate-900/90 text-white placeholder:text-slate-500 focus:outline-none focus:border-amber-400"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-slate-300 font-semibold mb-1">Telefone / WhatsApp</label>
+                  <input
+                    type="text"
+                    placeholder="(69) 99999-9999"
+                    value={chapPhone}
+                    onChange={(e) => setChapPhone(e.target.value)}
+                    className="w-full px-3 py-2 rounded-xl border border-slate-700 bg-slate-900/90 text-white placeholder:text-slate-500 focus:outline-none focus:border-amber-400"
+                  />
+                </div>
+                <div>
+                  <label className="block text-slate-300 font-semibold mb-1">Instagram (@)</label>
+                  <input
+                    type="text"
+                    placeholder="@cap.lucianodeassis118"
+                    value={chapInstagram}
+                    onChange={(e) => setChapInstagram(e.target.value)}
+                    className="w-full px-3 py-2 rounded-xl border border-slate-700 bg-slate-900/90 text-white placeholder:text-slate-500 focus:outline-none focus:border-amber-400"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-slate-300 font-semibold mb-1">URL do Brasão / Logo do Capítulo</label>
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    placeholder="Ex: /chapters/luciano-de-assis-118.png ou link web"
+                    value={chapLogo}
+                    onChange={(e) => setChapLogo(e.target.value)}
+                    className="w-full px-3 py-2 rounded-xl border border-slate-700 bg-slate-900/90 text-white placeholder:text-slate-500 focus:outline-none focus:border-amber-400"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setChapLogo('/chapters/luciano-de-assis-118.png')}
+                    className="px-2.5 py-1 text-[10px] rounded-lg bg-amber-500/20 text-amber-300 border border-amber-500/30 whitespace-nowrap cursor-pointer hover:bg-amber-500/30 transition-colors"
+                  >
+                    Brasão 118
+                  </button>
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-slate-300 font-semibold mb-1">História / Apresentação</label>
+                <textarea
+                  rows={2}
+                  placeholder="Breve resumo histórico da fundação e tradições..."
+                  value={chapHistory}
+                  onChange={(e) => setChapHistory(e.target.value)}
+                  className="w-full px-3 py-2 rounded-xl border border-slate-700 bg-slate-900/90 text-white placeholder:text-slate-500 focus:outline-none focus:border-amber-400 resize-none"
+                />
+              </div>
+
+              <div className="pt-3 border-t border-slate-800 flex items-center justify-end gap-2.5">
+                <button
+                  type="button"
+                  onClick={() => setIsChapterModalOpen(false)}
+                  className="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold cursor-pointer"
+                >
+                  Cancelar
+                </button>
+                <button
+                  type="submit"
+                  className="px-5 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold transition-all shadow-md cursor-pointer"
+                >
+                  {editingChapter ? 'Salvar Alterações' : 'Cadastrar Capítulo'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL 2: Alterar / Homologar Capítulo do Usuário */}
+      {userChapterModalOpen && targetUser && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 backdrop-blur-sm p-4 animate-in fade-in duration-200">
+          <div className="w-full max-w-md rounded-3xl border border-amber-500/40 bg-[#0A1124] text-white p-6 shadow-2xl relative">
+            <button
+              type="button"
+              onClick={() => setUserChapterModalOpen(false)}
+              className="absolute top-5 right-5 text-slate-400 hover:text-white p-1 text-lg font-bold cursor-pointer"
+            >
+              <X className="w-5 h-5" />
+            </button>
+
+            <div className="flex items-center gap-3 mb-4 pb-3 border-b border-amber-500/20">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-amber-400/15 text-amber-400">
+                <Edit2 className="h-5 w-5" />
+              </div>
+              <div>
+                <h3 className="font-serif text-base font-bold text-white">Alterar Capítulo do Membro</h3>
+                <p className="text-xs text-slate-400">
+                  {targetUser.fullName} ({targetUser.email})
+                </p>
+              </div>
+            </div>
+
+            <form onSubmit={handleSaveUserChapter} className="space-y-4 text-xs">
+              <div className="p-3 rounded-xl bg-slate-900 border border-slate-800">
+                <span className="text-slate-400 block text-[11px]">Capítulo atualmente registrado:</span>
+                <strong className="text-amber-400 text-xs">
+                  {targetUser.demolayDetails?.chapterName || 'Não informado'}
+                </strong>
+              </div>
+
+              <div>
+                <label className="block text-slate-300 font-semibold mb-1">
+                  Selecione o Capítulo Oficial:
+                </label>
+                <select
+                  value={targetChapterSelect}
+                  onChange={(e) => setTargetChapterSelect(e.target.value)}
+                  className="w-full px-3 py-2 text-xs rounded-xl border border-slate-700 bg-slate-900 text-white focus:outline-none focus:border-amber-400 cursor-pointer"
+                >
+                  {allChapters.map((chap) => (
+                    <option key={chap.id} value={chap.id}>
+                      {chap.name} nº {chap.number} ({chap.city} - {chap.state})
+                    </option>
+                  ))}
+                  <option value="custom">✍️ Digitar Outro / Personalizado</option>
+                </select>
+              </div>
+
+              {targetChapterSelect === 'custom' && (
+                <div className="space-y-1">
+                  <label className="block text-slate-300 font-semibold">
+                    Nome e Número do Capítulo Personalizado:
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="Ex: Capítulo Cavaleiros do Guaporé nº 340"
+                    value={targetCustomChapterName}
+                    onChange={(e) => setTargetCustomChapterName(e.target.value)}
+                    className="w-full px-3 py-2 rounded-xl border border-slate-700 bg-slate-900 text-white placeholder:text-slate-500 focus:outline-none focus:border-amber-400"
+                  />
+                </div>
+              )}
+
+              <div className="pt-3 border-t border-slate-800 flex items-center justify-end gap-2.5">
+                <button
+                  type="button"
+                  onClick={() => setUserChapterModalOpen(false)}
+                  className="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold cursor-pointer"
+                >
+                  Cancelar
+                </button>
+                <button
+                  type="submit"
+                  className="px-5 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold transition-all shadow-md cursor-pointer"
+                >
+                  Salvar e Vincular
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}
