@@ -153,18 +153,22 @@ export async function uploadImageFile(
       const { data, error } = await supabase.storage
         .from(bucket)
         .upload(filePath, blob, {
+          contentType: blob.type || 'image/jpeg',
           cacheControl: '3600',
           upsert: true,
         });
 
-      if (!error && data) {
+      if (error) {
+        console.warn(`[Supabase Storage] Aviso no bucket '${bucket}':`, error.message);
+      } else if (data) {
         const {
           data: { publicUrl },
         } = supabase.storage.from(bucket).getPublicUrl(filePath);
+        console.log(`[Supabase Storage] Upload concluído com sucesso: ${publicUrl}`);
         return publicUrl;
       }
     } catch (err) {
-      console.warn('Falha no upload do Supabase Storage. Usando fallback local:', err);
+      console.warn('[Supabase Storage] Falha ao comunicar com o Storage. Usando fallback local:', err);
     }
   }
 
