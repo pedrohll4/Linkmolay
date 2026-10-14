@@ -179,79 +179,79 @@ export const DashboardPage: React.FC = () => {
       )}
 
       {/* 2. KPIS EXECUTIVOS & IMPACTO FRATERNAL */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-4">
         {/* KPI 1: Status de Carreira */}
-        <Card variant="default" className="p-4 hover:border-amber-400/30 transition-all">
+        <Card variant="default" className="p-3 sm:p-4 hover:border-amber-400/30 transition-all">
           <div className="flex items-center justify-between mb-2">
-            <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">
+            <span className="text-[10px] sm:text-[11px] font-semibold text-slate-400 uppercase tracking-wider">
               Status Carreira
             </span>
-            <div className="w-7 h-7 rounded-lg bg-emerald-500/10 text-emerald-400 flex items-center justify-center">
+            <div className="w-6 h-6 sm:w-7 sm:h-7 rounded-lg bg-emerald-500/10 text-emerald-400 flex items-center justify-center">
               <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
             </div>
           </div>
-          <div className="text-base sm:text-lg font-bold text-slate-900 dark:text-white truncate">
+          <div className="text-sm sm:text-base font-bold text-slate-900 dark:text-white truncate">
             {isDeMolay
               ? currentUser?.demolayDetails?.openToWork
                 ? 'Disponível para Vagas'
                 : 'Não buscando'
               : 'Empresa Recrutadora'}
           </div>
-          <div className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
-            {isDeMolay ? 'Visível para Maçons empresários' : 'Buscando jovens talentos'}
+          <div className="text-[10px] sm:text-[11px] text-slate-500 dark:text-slate-400 mt-0.5 truncate">
+            {isDeMolay ? 'Visível para Maçons' : 'Buscando jovens talentos'}
           </div>
         </Card>
 
         {/* KPI 2: Conexões na Fraternidade */}
-        <Card variant="default" className="p-4 hover:border-amber-400/30 transition-all">
+        <Card variant="default" className="p-3 sm:p-4 hover:border-amber-400/30 transition-all">
           <div className="flex items-center justify-between mb-2">
-            <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">
+            <span className="text-[10px] sm:text-[11px] font-semibold text-slate-400 uppercase tracking-wider">
               Rede Fraternal
             </span>
-            <div className="w-7 h-7 rounded-lg bg-amber-500/10 text-amber-500 flex items-center justify-center">
-              <Users className="w-4 h-4" />
+            <div className="w-6 h-6 sm:w-7 sm:h-7 rounded-lg bg-amber-500/10 text-amber-500 flex items-center justify-center">
+              <Users className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
             </div>
           </div>
-          <div className="text-base sm:text-lg font-bold text-slate-900 dark:text-white">
-            {connectionsCount} Irmãos Conectados
+          <div className="text-sm sm:text-base font-bold text-slate-900 dark:text-white truncate">
+            {connectionsCount} Irmãos
           </div>
-          <div className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
+          <div className="text-[10px] sm:text-[11px] text-slate-500 dark:text-slate-400 mt-0.5 truncate">
             Laços de amizade e negócios
           </div>
         </Card>
 
         {/* KPI 3: Vagas Exclusivas */}
-        <Card variant="default" className="p-4 hover:border-amber-400/30 transition-all">
+        <Card variant="default" className="p-3 sm:p-4 hover:border-amber-400/30 transition-all">
           <div className="flex items-center justify-between mb-2">
-            <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">
+            <span className="text-[10px] sm:text-[11px] font-semibold text-slate-400 uppercase tracking-wider">
               Oportunidades
             </span>
-            <div className="w-7 h-7 rounded-lg bg-blue-500/10 text-blue-500 flex items-center justify-center">
-              <Briefcase className="w-4 h-4" />
+            <div className="w-6 h-6 sm:w-7 sm:h-7 rounded-lg bg-blue-500/10 text-blue-500 flex items-center justify-center">
+              <Briefcase className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
             </div>
           </div>
-          <div className="text-base sm:text-lg font-bold text-slate-900 dark:text-white">
+          <div className="text-sm sm:text-base font-bold text-slate-900 dark:text-white truncate">
             {recommendedJobs.length} Vagas Abertas
           </div>
-          <div className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
+          <div className="text-[10px] sm:text-[11px] text-slate-500 dark:text-slate-400 mt-0.5 truncate">
             Em empresas de Maçons
           </div>
         </Card>
 
         {/* KPI 4: Mentoria & Capítulos */}
-        <Card variant="default" className="p-4 hover:border-amber-400/30 transition-all">
+        <Card variant="default" className="p-3 sm:p-4 hover:border-amber-400/30 transition-all">
           <div className="flex items-center justify-between mb-2">
-            <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">
+            <span className="text-[10px] sm:text-[11px] font-semibold text-slate-400 uppercase tracking-wider">
               Capítulo Ativo
             </span>
-            <div className="w-7 h-7 rounded-lg bg-yellow-500/10 text-yellow-500 flex items-center justify-center">
-              <Landmark className="w-4 h-4" />
+            <div className="w-6 h-6 sm:w-7 sm:h-7 rounded-lg bg-yellow-500/10 text-yellow-500 flex items-center justify-center">
+              <Landmark className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
             </div>
           </div>
-          <div className="text-base sm:text-lg font-bold text-slate-900 dark:text-white truncate">
+          <div className="text-sm sm:text-base font-bold text-slate-900 dark:text-white truncate">
             {userChapter?.name || 'Capítulo Luciano de Assis nº 118'}
           </div>
-          <div className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
+          <div className="text-[10px] sm:text-[11px] text-slate-500 dark:text-slate-400 mt-0.5 truncate">
             {userChapter?.activeMembersCount || 42} membros regulares
           </div>
         </Card>
@@ -380,15 +380,15 @@ export const DashboardPage: React.FC = () => {
           </Card>
 
           {/* FILTRO DO FEED EM BOTÕES */}
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
             <h3 className="font-serif text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
               <Sparkles className="h-4 w-4 text-amber-500" />
               Feed da Comunidade
             </h3>
-            <div className="flex gap-1 bg-slate-100 dark:bg-[#0A1124] p-1 rounded-xl border border-slate-200/60 dark:border-slate-800 text-xs">
+            <div className="flex overflow-x-auto no-scrollbar gap-1 bg-slate-100 dark:bg-[#0A1124] p-1 rounded-xl border border-slate-200/60 dark:border-slate-800 text-xs w-full sm:w-auto">
               <button
                 onClick={() => setFeedFilter('all')}
-                className={`px-3 py-1 rounded-lg font-medium transition-colors cursor-pointer ${
+                className={`px-3 py-1.5 rounded-lg font-medium transition-colors cursor-pointer shrink-0 ${
                   feedFilter === 'all'
                     ? 'bg-white dark:bg-amber-400/15 text-slate-900 dark:text-amber-300 shadow-xs'
                     : 'text-slate-500 hover:text-slate-900 dark:hover:text-white'
@@ -398,7 +398,7 @@ export const DashboardPage: React.FC = () => {
               </button>
               <button
                 onClick={() => setFeedFilter('conquista')}
-                className={`px-3 py-1 rounded-lg font-medium transition-colors cursor-pointer ${
+                className={`px-3 py-1.5 rounded-lg font-medium transition-colors cursor-pointer shrink-0 ${
                   feedFilter === 'conquista'
                     ? 'bg-white dark:bg-amber-400/15 text-slate-900 dark:text-amber-300 shadow-xs'
                     : 'text-slate-500 hover:text-slate-900 dark:hover:text-white'
@@ -408,7 +408,7 @@ export const DashboardPage: React.FC = () => {
               </button>
               <button
                 onClick={() => setFeedFilter('projeto_capitulo')}
-                className={`px-3 py-1 rounded-lg font-medium transition-colors cursor-pointer ${
+                className={`px-3 py-1.5 rounded-lg font-medium transition-colors cursor-pointer shrink-0 ${
                   feedFilter === 'projeto_capitulo'
                     ? 'bg-white dark:bg-amber-400/15 text-slate-900 dark:text-amber-300 shadow-xs'
                     : 'text-slate-500 hover:text-slate-900 dark:hover:text-white'
@@ -418,7 +418,7 @@ export const DashboardPage: React.FC = () => {
               </button>
               <button
                 onClick={() => setFeedFilter('vaga')}
-                className={`px-3 py-1 rounded-lg font-medium transition-colors cursor-pointer ${
+                className={`px-3 py-1.5 rounded-lg font-medium transition-colors cursor-pointer shrink-0 ${
                   feedFilter === 'vaga'
                     ? 'bg-white dark:bg-amber-400/15 text-slate-900 dark:text-amber-300 shadow-xs'
                     : 'text-slate-500 hover:text-slate-900 dark:hover:text-white'

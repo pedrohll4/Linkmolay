@@ -108,14 +108,14 @@ export const TalentSearchPage: React.FC = () => {
           />
         </div>
 
-        <div className="flex flex-wrap items-center gap-3 pt-2 text-xs">
+        <div className="flex flex-wrap items-center gap-2 sm:gap-3 pt-2 text-xs">
           {/* Area */}
-          <div className="flex items-center gap-1.5">
-            <span className="text-slate-400 font-semibold">Área:</span>
+          <div className="flex items-center gap-1.5 flex-1 min-w-[130px] sm:flex-initial">
+            <span className="text-slate-400 font-semibold shrink-0">Área:</span>
             <select
               value={selectedArea}
               onChange={(e) => setSelectedArea(e.target.value)}
-              className="px-2.5 py-1.5 rounded-xl border border-slate-200 dark:border-navy-800 bg-slate-50 dark:bg-navy-950 text-slate-700 dark:text-slate-300 focus:outline-none"
+              className="w-full sm:w-auto px-2.5 py-1.5 rounded-xl border border-slate-200 dark:border-navy-800 bg-slate-50 dark:bg-navy-950 text-slate-700 dark:text-slate-300 focus:outline-none"
             >
               {INTEREST_AREAS.map((a) => (
                 <option key={a} value={a}>
@@ -126,12 +126,12 @@ export const TalentSearchPage: React.FC = () => {
           </div>
 
           {/* Estado */}
-          <div className="flex items-center gap-1.5">
-            <span className="text-slate-400 font-semibold">Estado:</span>
+          <div className="flex items-center gap-1.5 flex-1 min-w-[130px] sm:flex-initial">
+            <span className="text-slate-400 font-semibold shrink-0">Estado:</span>
             <select
               value={selectedState}
               onChange={(e) => setSelectedState(e.target.value)}
-              className="px-2.5 py-1.5 rounded-xl border border-slate-200 dark:border-navy-800 bg-slate-50 dark:bg-navy-950 text-slate-700 dark:text-slate-300 focus:outline-none"
+              className="w-full sm:w-auto px-2.5 py-1.5 rounded-xl border border-slate-200 dark:border-navy-800 bg-slate-50 dark:bg-navy-950 text-slate-700 dark:text-slate-300 focus:outline-none"
             >
               <option value="all">Todos os Estados</option>
               <option value="RO">Rondônia (RO)</option>
@@ -141,7 +141,7 @@ export const TalentSearchPage: React.FC = () => {
           </div>
 
           {/* Toggle Disponível Agora */}
-          <label className="flex items-center gap-2 cursor-pointer ml-auto bg-emerald-500/10 px-3 py-1.5 rounded-xl border border-emerald-500/20 text-emerald-400 font-semibold">
+          <label className="flex items-center gap-2 cursor-pointer sm:ml-auto w-full sm:w-auto justify-center sm:justify-start bg-emerald-500/10 px-3 py-1.5 rounded-xl border border-emerald-500/20 text-emerald-400 font-semibold">
             <input
               type="checkbox"
               checked={onlyOpenToWork}

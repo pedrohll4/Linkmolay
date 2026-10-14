@@ -30,9 +30,9 @@ export const AppLayout: React.FC = () => {
     <div className="min-h-screen bg-slate-50 dark:bg-navy-950 text-slate-900 dark:text-slate-100 flex flex-col antialiased transition-colors">
       <Navbar />
       
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full flex-1 flex gap-8 pb-20 lg:pb-12">
+      <div className="max-w-7xl mx-auto px-3.5 sm:px-6 lg:px-8 w-full flex-1 flex gap-8 pb-24 lg:pb-12">
         <Sidebar />
-        <main className="flex-1 min-w-0 py-6">
+        <main className="flex-1 min-w-0 py-4 sm:py-6">
           <Outlet />
         </main>
       </div>

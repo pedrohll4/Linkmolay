@@ -121,10 +121,10 @@ export const RegisterPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-navy-950 flex flex-col justify-center items-center p-4 py-12">
+    <div className="min-h-screen bg-slate-50 dark:bg-navy-950 flex flex-col justify-center items-center p-3.5 sm:p-4 py-8 sm:py-12">
       <div className="max-w-lg w-full">
         {/* Brand Header */}
-        <div className="text-center mb-8">
+        <div className="text-center mb-6 sm:mb-8">
           <Link to="/" className="inline-flex items-center gap-2.5 mb-3 group">
             <div className="w-10 h-10 rounded-2xl bg-navy-900 dark:bg-navy-850 border border-gold-500/30 flex items-center justify-center shadow-md">
               <span className="font-bold text-lg text-gold-400">LM</span>
@@ -142,7 +142,7 @@ export const RegisterPage: React.FC = () => {
         </div>
 
         {/* Form Card */}
-        <div className="rounded-3xl border border-slate-200 dark:border-navy-800 bg-white dark:bg-navy-900 p-8 shadow-xl">
+        <div className="rounded-3xl border border-slate-200 dark:border-navy-800 bg-white dark:bg-navy-900 p-5 sm:p-8 shadow-xl">
           {/* Role Selector Tabs */}
           <div className="grid grid-cols-2 gap-3 mb-6 p-1 bg-slate-100 dark:bg-navy-950 rounded-2xl border border-slate-200/60 dark:border-navy-800">
             <button

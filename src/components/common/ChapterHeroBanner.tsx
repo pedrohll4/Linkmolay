@@ -129,37 +129,37 @@ export const ChapterHeroBanner: React.FC<ChapterHeroBannerProps> = ({ user, chap
 
         <div className="relative z-10">
           {/* Topo do Banner: Brasão, Identificação do Capítulo e Lema */}
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 pb-6 border-b border-amber-400/15">
-            <div className="flex items-start sm:items-center gap-4">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 sm:gap-6 pb-6 border-b border-amber-400/15">
+            <div className="flex items-start sm:items-center gap-3 sm:gap-4">
               {/* Brasão Heráldico */}
-              <div className="relative flex h-16 w-16 md:h-20 md:w-20 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-amber-400/20 via-amber-500/10 to-transparent p-0.5 border border-amber-400/40 shadow-inner shadow-amber-500/20">
+              <div className="relative flex h-14 w-14 sm:h-16 sm:w-16 md:h-20 md:w-20 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-amber-400/20 via-amber-500/10 to-transparent p-0.5 border border-amber-400/40 shadow-inner shadow-amber-500/20">
                 <div className="flex h-full w-full items-center justify-center rounded-2xl bg-[#091024]">
-                  <Award className="h-9 w-9 md:h-11 md:w-11 text-amber-400 drop-shadow-[0_2px_10px_rgba(212,175,55,0.4)]" />
+                  <Award className="h-7 w-7 sm:h-9 sm:w-9 md:h-11 md:w-11 text-amber-400 drop-shadow-[0_2px_10px_rgba(212,175,55,0.4)]" />
                 </div>
-                <div className="absolute -bottom-1 -right-1 flex h-6 w-6 items-center justify-center rounded-full bg-amber-400 text-[#070D1E] font-bold text-xs shadow-md">
+                <div className="absolute -bottom-1 -right-1 flex h-5 w-5 sm:h-6 sm:w-6 items-center justify-center rounded-full bg-amber-400 text-[#070D1E] font-bold text-[10px] sm:text-xs shadow-md">
                   ★
                 </div>
               </div>
 
               {/* Títulos e Saudação Fraternal */}
-              <div>
-                <div className="flex flex-wrap items-center gap-2 mb-1.5">
-                  <Badge variant="verified" className="text-[11px] tracking-wide uppercase">
-                    {isMason ? '✓ Maçom Regular' : '✓ DeMolay Ativo & Regular'}
+              <div className="min-w-0">
+                <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 mb-1">
+                  <Badge variant="verified" className="text-[10px] sm:text-[11px] tracking-wide uppercase px-2 py-0.5">
+                    {isMason ? '✓ Maçom Regular' : '✓ DeMolay Ativo'}
                   </Badge>
-                  <span className="text-xs text-amber-300/80 font-medium tracking-wide">
+                  <span className="text-[11px] sm:text-xs text-amber-300/80 font-medium tracking-wide truncate">
                     {isMason ? (user.masonDetails?.lodgeName || 'Loja Maçônica') : `${chapterName} nº ${chapterNumber}`}
                   </span>
                 </div>
 
-                <h1 className="font-serif text-2xl md:text-3xl lg:text-4xl font-bold tracking-tight text-white drop-shadow-sm">
+                <h1 className="font-serif text-lg sm:text-2xl md:text-3xl lg:text-4xl font-bold tracking-tight text-white drop-shadow-sm leading-tight">
                   {isMason ? 'Respeitável Irmão ' : 'Saudações Fraternais, Irmão '}
                   <span className="bg-gradient-to-r from-amber-200 via-amber-400 to-yellow-300 bg-clip-text text-transparent">
                     {user.fullName.split(' ')[0]}
                   </span>
                 </h1>
 
-                <p className="mt-1 text-xs sm:text-sm text-slate-300 max-w-2xl font-light">
+                <p className="mt-1 text-xs sm:text-sm text-slate-300 max-w-2xl font-light leading-relaxed">
                   {isMason
                     ? 'Bem-vindo ao centro de conexão da Maçonaria com os jovens talentos da Ordem DeMolay. Suas oportunidades constroem o futuro da nossa Fraternidade.'
                     : `Sua jornada de liderança começou no altar do ${chapterName}. Aqui no LinkMolay, seus valores fraternais abrem as portas do mercado profissional.`}
@@ -168,10 +168,10 @@ export const ChapterHeroBanner: React.FC<ChapterHeroBannerProps> = ({ user, chap
             </div>
 
             {/* Ação rápida para ver o Capítulo */}
-            <div className="flex items-center gap-2 self-start md:self-center shrink-0">
+            <div className="flex items-center gap-2 self-start md:self-center shrink-0 w-full sm:w-auto">
               {chapter && (
-                <Link to={`/capitulos/${chapter.id}`}>
-                  <Button variant="goldOutline" size="sm" className="gap-2 text-xs">
+                <Link to={`/capitulos/${chapter.id}`} className="w-full sm:w-auto">
+                  <Button variant="goldOutline" size="sm" className="w-full sm:w-auto gap-2 text-xs">
                     <Building className="h-3.5 w-3.5" />
                     Página do Capítulo
                     <ArrowRight className="h-3 w-3" />
@@ -182,7 +182,7 @@ export const ChapterHeroBanner: React.FC<ChapterHeroBannerProps> = ({ user, chap
           </div>
 
           {/* As 7 Virtudes Cardeais da Ordem DeMolay */}
-          <div className="pt-6">
+          <div className="pt-5 sm:pt-6">
             <div className="flex items-center justify-between mb-3">
               <div className="flex items-center gap-2">
                 <span className="flex h-2 w-2 rounded-full bg-amber-400 animate-pulse" />
@@ -193,16 +193,19 @@ export const ChapterHeroBanner: React.FC<ChapterHeroBannerProps> = ({ user, chap
               <span className="text-[11px] text-slate-400 hidden sm:inline-block">
                 Clique em uma virtude para entender seu impacto na carreira
               </span>
+              <span className="text-[10px] text-amber-400/80 font-medium sm:hidden flex items-center gap-1">
+                Deslize para ver todas →
+              </span>
             </div>
 
-            <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-2">
+            <div className="flex sm:grid sm:grid-cols-4 lg:grid-cols-7 gap-2 overflow-x-auto no-scrollbar pb-2 sm:pb-0 -mx-4 px-4 sm:mx-0 sm:px-0">
               {VIRTUES.map((virtue, index) => {
                 const Icon = virtue.icon;
                 return (
                   <button
                     key={virtue.id}
                     onClick={() => setSelectedVirtue(virtue)}
-                    className="group relative flex flex-col items-center justify-center rounded-xl border border-amber-400/20 bg-[#0E162E]/70 p-2.5 text-center transition-all duration-200 hover:border-amber-400/60 hover:bg-[#131D3B] hover:shadow-lg hover:shadow-amber-500/10 cursor-pointer"
+                    className="group relative flex flex-col items-center justify-center rounded-xl border border-amber-400/20 bg-[#0E162E]/70 p-2.5 text-center transition-all duration-200 hover:border-amber-400/60 hover:bg-[#131D3B] hover:shadow-lg hover:shadow-amber-500/10 cursor-pointer min-w-[110px] sm:min-w-0 shrink-0 sm:shrink"
                   >
                     <div className="mb-1 flex h-8 w-8 items-center justify-center rounded-lg bg-amber-400/10 text-amber-300 group-hover:bg-amber-400 group-hover:text-slate-950 transition-colors">
                       <Icon className="h-4 w-4" />

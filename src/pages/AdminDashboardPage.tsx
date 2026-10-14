@@ -361,10 +361,10 @@ export const AdminDashboardPage: React.FC = () => {
       )}
 
       {/* Tabs */}
-      <div className="flex border-b border-slate-200/80 dark:border-navy-850 gap-6 text-xs font-semibold">
+      <div className="flex border-b border-slate-200/80 dark:border-navy-850 gap-4 sm:gap-6 text-xs font-semibold overflow-x-auto no-scrollbar pb-0.5">
         <button
           onClick={() => setActiveTab('pending')}
-          className={`pb-3 flex items-center gap-2 transition-all ${
+          className={`pb-3 flex items-center gap-2 transition-all shrink-0 whitespace-nowrap ${
             activeTab === 'pending'
               ? 'text-amber-500 font-bold border-b-2 border-amber-500'
               : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'
@@ -380,7 +380,7 @@ export const AdminDashboardPage: React.FC = () => {
 
         <button
           onClick={() => setActiveTab('users')}
-          className={`pb-3 transition-all ${
+          className={`pb-3 transition-all shrink-0 whitespace-nowrap ${
             activeTab === 'users'
               ? 'text-purple-400 font-bold border-b-2 border-purple-400'
               : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'
@@ -391,7 +391,7 @@ export const AdminDashboardPage: React.FC = () => {
 
         <button
           onClick={() => setActiveTab('chapters')}
-          className={`pb-3 flex items-center gap-1.5 transition-all ${
+          className={`pb-3 flex items-center gap-1.5 transition-all shrink-0 whitespace-nowrap ${
             activeTab === 'chapters'
               ? 'text-yellow-500 font-bold border-b-2 border-yellow-500'
               : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'
@@ -406,7 +406,7 @@ export const AdminDashboardPage: React.FC = () => {
 
         <button
           onClick={() => setActiveTab('jobs')}
-          className={`pb-3 transition-all ${
+          className={`pb-3 transition-all shrink-0 whitespace-nowrap ${
             activeTab === 'jobs'
               ? 'text-gold-500 font-bold border-b-2 border-gold-500'
               : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'
@@ -417,7 +417,7 @@ export const AdminDashboardPage: React.FC = () => {
 
         <button
           onClick={() => setActiveTab('audit')}
-          className={`pb-3 transition-all ${
+          className={`pb-3 transition-all shrink-0 whitespace-nowrap ${
             activeTab === 'audit'
               ? 'text-purple-400 font-bold border-b-2 border-purple-400'
               : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'

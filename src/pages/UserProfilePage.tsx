@@ -128,23 +128,23 @@ export const UserProfilePage: React.FC = () => {
           <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/30 pointer-events-none" />
         </div>
 
-        <div className="px-6 sm:px-8 pb-8 pt-0 relative">
-          <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-6 -mt-20 sm:-mt-24 mb-6">
-            <div className="flex items-end gap-5">
+        <div className="px-4 sm:px-8 pb-6 sm:pb-8 pt-0 relative">
+          <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 sm:gap-6 -mt-16 sm:-mt-24 mb-4 sm:mb-6">
+            <div className="flex items-end gap-3.5 sm:gap-5">
               <Avatar
                 size="xl"
                 withRing
-                className="h-28 w-28 sm:h-36 sm:w-36 border-4 border-[#070D1E] bg-[#0E162E] shadow-2xl shrink-0"
+                className="h-24 w-24 sm:h-36 sm:w-36 border-4 border-[#070D1E] bg-[#0E162E] shadow-2xl shrink-0"
               >
                 <AvatarImage src={profile.avatarUrl || ''} alt={profile.fullName} />
-                <AvatarFallback className="text-3xl font-serif text-amber-300">
+                <AvatarFallback className="text-2xl sm:text-3xl font-serif text-amber-300">
                   {profile.fullName.slice(0, 2).toUpperCase()}
                 </AvatarFallback>
               </Avatar>
 
-              <div className="mb-2">
-                <div className="flex items-center gap-2 flex-wrap">
-                  <h1 className="font-serif text-2xl sm:text-3xl font-bold text-white drop-shadow-sm">
+              <div className="mb-1 sm:mb-2 min-w-0">
+                <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap">
+                  <h1 className="font-serif text-xl sm:text-3xl font-bold text-white drop-shadow-sm truncate">
                     {profile.fullName}
                   </h1>
                   {profile.verified && (
@@ -152,14 +152,14 @@ export const UserProfilePage: React.FC = () => {
                   )}
                 </div>
 
-                <p className="text-xs sm:text-sm text-amber-300/90 font-medium mt-0.5 flex items-center gap-1.5">
-                  <Landmark className="w-3.5 h-3.5 text-amber-400" />
-                  {chapterTitle}
+                <p className="text-xs sm:text-sm text-amber-300/90 font-medium mt-0.5 flex items-center gap-1.5 truncate">
+                  <Landmark className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+                  <span className="truncate">{chapterTitle}</span>
                 </p>
 
-                <p className="text-xs text-slate-400 mt-0.5 flex items-center gap-2">
-                  <MapPin className="w-3.5 h-3.5 text-slate-400" />
-                  {profile.city} - {profile.state}
+                <p className="text-xs text-slate-400 mt-0.5 flex items-center gap-1.5 flex-wrap">
+                  <MapPin className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                  <span>{profile.city} - {profile.state}</span>
                   <span>•</span>
                   <span className="text-slate-300">{rankTitle}</span>
                 </p>
@@ -295,10 +295,10 @@ export const UserProfilePage: React.FC = () => {
 
       {/* 2. ABAS DE DETALHES SHADCN */}
       <Tabs defaultValue="visao_geral" className="w-full">
-        <TabsList className="grid grid-cols-3 max-w-xl">
-          <TabsTrigger value="visao_geral">Visão Geral</TabsTrigger>
-          <TabsTrigger value="trajetoria">🏛️ Trajetória Fraternal</TabsTrigger>
-          <TabsTrigger value="habilidades">🎓 Competências</TabsTrigger>
+        <TabsList className="flex w-full overflow-x-auto no-scrollbar sm:grid sm:grid-cols-3 max-w-xl gap-1 p-1 h-auto min-h-11">
+          <TabsTrigger value="visao_geral" className="shrink-0 text-xs sm:text-sm py-2 px-3">Visão Geral</TabsTrigger>
+          <TabsTrigger value="trajetoria" className="shrink-0 text-xs sm:text-sm py-2 px-3">🏛️ Trajetória Fraternal</TabsTrigger>
+          <TabsTrigger value="habilidades" className="shrink-0 text-xs sm:text-sm py-2 px-3">🎓 Competências</TabsTrigger>
         </TabsList>
 
         <TabsContent value="visao_geral" className="space-y-6">

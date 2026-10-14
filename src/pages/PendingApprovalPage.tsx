@@ -9,7 +9,7 @@ export const PendingApprovalPage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-navy-950 flex flex-col justify-center items-center p-4">
-      <div className="max-w-md w-full rounded-3xl border border-slate-200 dark:border-navy-800 bg-white dark:bg-navy-900 p-8 shadow-2xl text-center relative overflow-hidden">
+      <div className="max-w-md w-full rounded-3xl border border-slate-200 dark:border-navy-800 bg-white dark:bg-navy-900 p-5 sm:p-8 shadow-2xl text-center relative overflow-hidden">
         {/* Decorative Top Accent */}
         <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-gold-600 via-gold-400 to-gold-600" />
 

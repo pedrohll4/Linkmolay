@@ -67,10 +67,10 @@ export const NetworkPage: React.FC = () => {
       </div>
 
       {/* Tabs */}
-      <div className="flex border-b border-slate-200/80 dark:border-navy-850 gap-6 text-xs font-semibold">
+      <div className="flex border-b border-slate-200/80 dark:border-navy-850 gap-4 sm:gap-6 text-xs font-semibold overflow-x-auto no-scrollbar pb-0.5">
         <button
           onClick={() => setActiveTab('connections')}
-          className={`pb-3 flex items-center gap-2 transition-all relative ${
+          className={`pb-3 flex items-center gap-2 transition-all shrink-0 whitespace-nowrap relative ${
             activeTab === 'connections'
               ? 'text-gold-500 font-bold border-b-2 border-gold-500'
               : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'
@@ -84,7 +84,7 @@ export const NetworkPage: React.FC = () => {
 
         <button
           onClick={() => setActiveTab('received')}
-          className={`pb-3 flex items-center gap-2 transition-all relative ${
+          className={`pb-3 flex items-center gap-2 transition-all shrink-0 whitespace-nowrap relative ${
             activeTab === 'received'
               ? 'text-gold-500 font-bold border-b-2 border-gold-500'
               : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'
@@ -100,7 +100,7 @@ export const NetworkPage: React.FC = () => {
 
         <button
           onClick={() => setActiveTab('sent')}
-          className={`pb-3 flex items-center gap-2 transition-all relative ${
+          className={`pb-3 flex items-center gap-2 transition-all shrink-0 whitespace-nowrap relative ${
             activeTab === 'sent'
               ? 'text-gold-500 font-bold border-b-2 border-gold-500'
               : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'

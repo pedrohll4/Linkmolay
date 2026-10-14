@@ -256,16 +256,17 @@ export const MyProfilePage: React.FC = () => {
           <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/30 pointer-events-none" />
 
           {/* Botões do Topo da Capa */}
-          <div className="absolute top-4 right-4 flex items-center gap-2.5 z-10">
+          <div className="absolute top-3 right-3 sm:top-4 sm:right-4 flex items-center gap-1.5 sm:gap-2.5 z-10">
             {/* Botão de Alterar Capa */}
             <Button
               variant="secondary"
               size="sm"
               onClick={() => setIsBannerModalOpen(true)}
-              className="gap-1.5 text-xs bg-slate-900/85 hover:bg-slate-900 text-white border border-amber-400/40 backdrop-blur-md shadow-lg cursor-pointer"
+              className="gap-1.5 text-xs bg-slate-900/85 hover:bg-slate-900 text-white border border-amber-400/40 backdrop-blur-md shadow-lg cursor-pointer px-2.5 sm:px-3"
             >
               <Camera className="w-3.5 h-3.5 text-amber-400" />
-              <span>Alterar Capa</span>
+              <span className="hidden sm:inline">Alterar Capa</span>
+              <span className="sm:hidden">Capa</span>
             </Button>
 
             {!isEditing ? (
@@ -273,36 +274,38 @@ export const MyProfilePage: React.FC = () => {
                 variant="goldOutline"
                 size="sm"
                 onClick={() => setIsEditing(true)}
-                className="gap-2 text-xs backdrop-blur-md"
+                className="gap-1.5 sm:gap-2 text-xs backdrop-blur-md px-2.5 sm:px-3"
               >
-                <Edit2 className="w-3.5 h-3.5" /> Editar Meu Perfil
+                <Edit2 className="w-3.5 h-3.5" />
+                <span className="hidden sm:inline">Editar Meu Perfil</span>
+                <span className="sm:hidden">Editar</span>
               </Button>
             ) : (
               <Button
                 variant="secondary"
                 size="sm"
                 onClick={() => setIsEditing(false)}
-                className="text-xs"
+                className="text-xs px-2.5 sm:px-3"
               >
-                Cancelar Edição
+                Cancelar
               </Button>
             )}
           </div>
         </div>
 
         {/* Informações Principais do Membro */}
-        <div className="px-6 sm:px-8 pb-8 pt-0 relative">
-          <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-6 -mt-20 sm:-mt-24 mb-6">
-            <div className="flex items-end gap-5">
+        <div className="px-4 sm:px-8 pb-6 sm:pb-8 pt-0 relative">
+          <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 sm:gap-6 -mt-16 sm:-mt-24 mb-4 sm:mb-6">
+            <div className="flex items-end gap-3.5 sm:gap-5">
               {/* Avatar com Botão de Upload Direto */}
               <div className="relative group shrink-0">
                 <Avatar
                   size="xl"
                   withRing
-                  className="h-28 w-28 sm:h-36 sm:w-36 border-4 border-[#070D1E] bg-[#0E162E] shadow-2xl overflow-hidden"
+                  className="h-24 w-24 sm:h-36 sm:w-36 border-4 border-[#070D1E] bg-[#0E162E] shadow-2xl overflow-hidden"
                 >
                   <AvatarImage src={avatarUrl || ''} alt={currentUser.fullName} />
-                  <AvatarFallback className="text-3xl font-serif text-amber-300">
+                  <AvatarFallback className="text-2xl sm:text-3xl font-serif text-amber-300">
                     {currentUser.fullName.slice(0, 2).toUpperCase()}
                   </AvatarFallback>
                 </Avatar>
@@ -311,16 +314,16 @@ export const MyProfilePage: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => setIsAvatarModalOpen(true)}
-                  className="absolute bottom-1 right-1 flex h-9 w-9 items-center justify-center rounded-full bg-amber-400 hover:bg-amber-300 text-slate-950 shadow-xl border-2 border-[#070D1E] transition-transform hover:scale-110 cursor-pointer"
+                  className="absolute bottom-0 right-0 sm:bottom-1 sm:right-1 flex h-8 w-8 sm:h-9 sm:w-9 items-center justify-center rounded-full bg-amber-400 hover:bg-amber-300 text-slate-950 shadow-xl border-2 border-[#070D1E] transition-transform hover:scale-110 cursor-pointer"
                   title="Alterar foto de perfil"
                 >
-                  <Camera className="h-4 w-4" />
+                  <Camera className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
                 </button>
               </div>
 
-              <div className="mb-2">
-                <div className="flex items-center gap-2 flex-wrap">
-                  <h1 className="font-serif text-2xl sm:text-3xl font-bold text-white drop-shadow-sm">
+              <div className="mb-1 sm:mb-2 min-w-0">
+                <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap">
+                  <h1 className="font-serif text-xl sm:text-3xl font-bold text-white drop-shadow-sm truncate">
                     {currentUser.fullName}
                   </h1>
                   {currentUser.verified && role && (
@@ -328,14 +331,14 @@ export const MyProfilePage: React.FC = () => {
                   )}
                 </div>
 
-                <p className="text-xs sm:text-sm text-amber-300/90 font-medium mt-0.5 flex items-center gap-1.5">
-                  <Landmark className="w-3.5 h-3.5 text-amber-400" />
-                  {chapterTitle}
+                <p className="text-xs sm:text-sm text-amber-300/90 font-medium mt-0.5 flex items-center gap-1.5 truncate">
+                  <Landmark className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+                  <span className="truncate">{chapterTitle}</span>
                 </p>
 
-                <p className="text-xs text-slate-400 mt-0.5 flex items-center gap-2">
-                  <MapPin className="w-3.5 h-3.5 text-slate-400" />
-                  {currentUser.city} - {currentUser.state}
+                <p className="text-xs text-slate-400 mt-0.5 flex items-center gap-1.5 flex-wrap">
+                  <MapPin className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                  <span>{currentUser.city} - {currentUser.state}</span>
                   <span>•</span>
                   <span className="text-slate-300">{rankTitle}</span>
                 </p>
@@ -645,11 +648,11 @@ export const MyProfilePage: React.FC = () => {
 
       {/* 3. ABAS SHADCN: VISÃO GERAL, CAPÍTULO & LIDERANÇA, CARREIRA, HABILIDADES */}
       <Tabs defaultValue="visao_geral" className="w-full">
-        <TabsList className="grid grid-cols-3 sm:grid-cols-4 max-w-2xl">
-          <TabsTrigger value="visao_geral">Visão Geral</TabsTrigger>
-          <TabsTrigger value="capitulo">🏛️ Capítulo & Liderança</TabsTrigger>
-          <TabsTrigger value="carreira">💼 Carreira & Projetos</TabsTrigger>
-          <TabsTrigger value="habilidades">🎓 Competências</TabsTrigger>
+        <TabsList className="flex w-full overflow-x-auto no-scrollbar sm:grid sm:grid-cols-4 max-w-2xl gap-1 p-1 h-auto min-h-11">
+          <TabsTrigger value="visao_geral" className="shrink-0 text-xs sm:text-sm py-2 px-3">Visão Geral</TabsTrigger>
+          <TabsTrigger value="capitulo" className="shrink-0 text-xs sm:text-sm py-2 px-3">🏛️ Capítulo & Liderança</TabsTrigger>
+          <TabsTrigger value="carreira" className="shrink-0 text-xs sm:text-sm py-2 px-3">💼 Carreira & Projetos</TabsTrigger>
+          <TabsTrigger value="habilidades" className="shrink-0 text-xs sm:text-sm py-2 px-3">🎓 Competências</TabsTrigger>
         </TabsList>
 
         {/* ABA 1: VISÃO GERAL */}

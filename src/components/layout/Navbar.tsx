@@ -17,10 +17,18 @@ import {
   Users,
   Check,
   ChevronDown,
+  Menu,
+  X,
+  Home,
+  Network,
+  MessageSquare,
+  Landmark,
+  Building2,
+  FileCheck,
 } from 'lucide-react';
 
 export const Navbar: React.FC = () => {
-  const { currentUser, role, logout, switchAccount } = useAuth();
+  const { currentUser, role, logout, switchAccount, isAdmin, isMason, isDeMolay } = useAuth();
   const { theme, setTheme } = useTheme();
   const { notifications, unreadCount, markAsRead, markAllAsRead } = useNotifications();
   const navigate = useNavigate();
@@ -28,6 +36,8 @@ export const Navbar: React.FC = () => {
   const [showNotifications, setShowNotifications] = useState(false);
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [showDemoSwitcher, setShowDemoSwitcher] = useState(false);
+  const [showMobileDrawer, setShowMobileDrawer] = useState(false);
+  const [showMobileSearch, setShowMobileSearch] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
 
   const notifRef = useRef<HTMLDivElement>(null);
@@ -61,8 +71,18 @@ export const Navbar: React.FC = () => {
   return (
     <header className="sticky top-0 z-40 w-full border-b border-slate-200/80 dark:border-navy-850 bg-white/90 dark:bg-navy-950/90 backdrop-blur-md transition-colors">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
-        {/* Brand Logo */}
-        <div className="flex items-center gap-6">
+        {/* Brand Logo & Mobile Menu Hamburger */}
+        <div className="flex items-center gap-2.5 sm:gap-6">
+          {/* Mobile Menu Button (<lg) */}
+          <button
+            type="button"
+            onClick={() => setShowMobileDrawer(true)}
+            className="lg:hidden p-2 -ml-1 rounded-xl text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-navy-850 transition-colors"
+            aria-label="Abrir menu de navegação"
+          >
+            <Menu className="w-5 h-5 text-gold-500" />
+          </button>
+
           <Link to="/dashboard" className="flex items-center gap-2.5 group">
             <div className="w-9 h-9 rounded-xl bg-navy-900 dark:bg-navy-850 border border-gold-500/30 flex items-center justify-center shadow-xs group-hover:border-gold-400 transition-colors">
               <span className="font-bold text-base text-gold-400 tracking-wider">LM</span>
@@ -77,7 +97,7 @@ export const Navbar: React.FC = () => {
             </div>
           </Link>
 
-          {/* Search bar */}
+          {/* Search bar (Desktop) */}
           <form onSubmit={handleSearch} className="hidden md:block relative w-64 lg:w-80">
             <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
             <input
@@ -91,7 +111,17 @@ export const Navbar: React.FC = () => {
         </div>
 
         {/* Action Controls */}
-        <div className="flex items-center gap-2 sm:gap-3">
+        <div className="flex items-center gap-1.5 sm:gap-3">
+          {/* Mobile Search Toggle */}
+          <button
+            type="button"
+            onClick={() => setShowMobileSearch(!showMobileSearch)}
+            className="md:hidden p-2 rounded-xl border border-slate-200 dark:border-navy-800 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-navy-850 transition-colors"
+            title="Buscar vagas e membros"
+          >
+            <Search className="w-4 h-4" />
+          </button>
+
           {/* Quick Demo Switcher Tool (MVP Testing Utility) */}
           <div className="relative" ref={demoRef}>
             <button
@@ -332,6 +362,223 @@ export const Navbar: React.FC = () => {
           )}
         </div>
       </div>
+
+      {/* Mobile Search Expandable Bar */}
+      {showMobileSearch && (
+        <div className="md:hidden px-4 py-2.5 border-t border-slate-200/80 dark:border-navy-850 bg-slate-50/95 dark:bg-navy-900/95 backdrop-blur-md animate-in slide-in-from-top-2 duration-150">
+          <form
+            onSubmit={(e) => {
+              handleSearch(e);
+              setShowMobileSearch(false);
+            }}
+            className="relative w-full"
+          >
+            <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+            <input
+              type="text"
+              placeholder="Buscar vagas, talentos, capítulos..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              autoFocus
+              className="w-full pl-9 pr-3 py-2 text-xs rounded-xl border border-slate-200 dark:border-navy-800 bg-white dark:bg-navy-950 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 focus:outline-none focus:ring-1 focus:ring-gold-500"
+            />
+          </form>
+        </div>
+      )}
+
+      {/* Mobile Navigation Drawer (Sheet) */}
+      {showMobileDrawer && (
+        <div className="fixed inset-0 z-50 lg:hidden">
+          {/* Backdrop */}
+          <div
+            className="fixed inset-0 bg-black/60 backdrop-blur-xs transition-opacity animate-in fade-in"
+            onClick={() => setShowMobileDrawer(false)}
+          />
+
+          {/* Drawer Body */}
+          <aside className="fixed top-0 bottom-0 left-0 w-80 max-w-[85vw] bg-white dark:bg-[#070D1E] border-r border-slate-200 dark:border-navy-800 z-50 overflow-y-auto p-4 flex flex-col justify-between shadow-2xl animate-in slide-in-from-left duration-200">
+            <div className="space-y-4">
+              {/* Drawer Header */}
+              <div className="flex items-center justify-between pb-3 border-b border-slate-200/80 dark:border-navy-800">
+                <Link
+                  to="/dashboard"
+                  onClick={() => setShowMobileDrawer(false)}
+                  className="flex items-center gap-2"
+                >
+                  <div className="w-8 h-8 rounded-xl bg-navy-900 dark:bg-navy-850 border border-gold-500/30 flex items-center justify-center">
+                    <span className="font-bold text-sm text-gold-400">LM</span>
+                  </div>
+                  <span className="font-extrabold text-base text-navy-900 dark:text-white">
+                    LINK<span className="text-gold-500 dark:text-gold-400">MOLAY</span>
+                  </span>
+                </Link>
+                <button
+                  type="button"
+                  onClick={() => setShowMobileDrawer(false)}
+                  className="p-1.5 rounded-xl text-slate-400 hover:text-slate-700 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-navy-850 transition-colors"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+
+              {/* User Identity Mini Card */}
+              {currentUser && (
+                <div className="p-3.5 rounded-2xl border border-slate-200/80 dark:border-navy-800 bg-slate-50 dark:bg-navy-900/60">
+                  <div className="flex items-center gap-3 mb-2">
+                    <div className="w-10 h-10 rounded-xl overflow-hidden bg-navy-800 border border-gold-500/30 flex items-center justify-center font-bold text-gold-400 text-sm shrink-0">
+                      {currentUser.avatarUrl ? (
+                        <img src={currentUser.avatarUrl} alt={currentUser.fullName} className="w-full h-full object-cover" />
+                      ) : (
+                        currentUser.fullName.slice(0, 2).toUpperCase()
+                      )}
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <h4 className="text-xs font-bold text-slate-900 dark:text-white truncate">
+                        {currentUser.fullName}
+                      </h4>
+                      <p className="text-[11px] text-slate-400 truncate">
+                        {currentUser.city}, {currentUser.state}
+                      </p>
+                    </div>
+                  </div>
+                  {currentUser.verified && role && (
+                    <VerifiedBadge role={role} size="sm" />
+                  )}
+                </div>
+              )}
+
+              {/* Mobile Search inside Drawer */}
+              <form
+                onSubmit={(e) => {
+                  handleSearch(e);
+                  setShowMobileDrawer(false);
+                }}
+                className="relative"
+              >
+                <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                <input
+                  type="text"
+                  placeholder="Buscar vagas, talentos..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="w-full pl-8 pr-3 py-2 text-xs rounded-xl border border-slate-200 dark:border-navy-800 bg-slate-50 dark:bg-navy-950 text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-1 focus:ring-gold-500"
+                />
+              </form>
+
+              {/* Navigation Links */}
+              <nav className="space-y-1 pt-1">
+                {[
+                  { label: 'Início', path: '/dashboard', icon: Home },
+                  { label: 'Meu Perfil', path: '/meu-perfil', icon: User },
+                  { label: 'Oportunidades & Vagas', path: '/oportunidades', icon: Briefcase },
+                  { label: 'Encontrar Talentos', path: '/talentos', icon: Users },
+                  { label: 'Minha Rede Fraternal', path: '/rede', icon: Network },
+                  { label: 'Mensagens', path: '/mensagens', icon: MessageSquare, badge: unreadCount },
+                  { label: 'Capítulos DeMolay', path: '/capitulos', icon: Landmark },
+                  { label: 'Empresas Parceiras', path: '/empresas', icon: Building2 },
+                ].map((item) => {
+                  const Icon = item.icon;
+                  return (
+                    <Link
+                      key={item.path}
+                      to={item.path}
+                      onClick={() => setShowMobileDrawer(false)}
+                      className="flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-200 hover:bg-gold-500/10 hover:text-gold-500 dark:hover:text-gold-400 transition-colors"
+                    >
+                      <div className="flex items-center gap-3">
+                        <Icon className="w-4 h-4 text-gold-500/80 shrink-0" />
+                        <span>{item.label}</span>
+                      </div>
+                      {item.badge && item.badge > 0 ? (
+                        <span className="min-w-4 h-4 px-1 rounded-full bg-gold-500 text-slate-950 font-extrabold text-[9px] flex items-center justify-center">
+                          {item.badge}
+                        </span>
+                      ) : null}
+                    </Link>
+                  );
+                })}
+
+                {/* Sub-section: Minhas Atividades */}
+                <div className="pt-3 border-t border-slate-200/80 dark:border-navy-850 my-2">
+                  <span className="px-3 text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-navy-400">
+                    Minhas Atividades
+                  </span>
+                </div>
+
+                {isDeMolay && (
+                  <Link
+                    to="/minhas-candidaturas"
+                    onClick={() => setShowMobileDrawer(false)}
+                    className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-200 hover:bg-gold-500/10 hover:text-gold-400 transition-colors"
+                  >
+                    <FileCheck className="w-4 h-4 text-blue-400 shrink-0" />
+                    <span>Minhas Candidaturas</span>
+                  </Link>
+                )}
+
+                {(isMason || isAdmin) && (
+                  <Link
+                    to="/minhas-vagas"
+                    onClick={() => setShowMobileDrawer(false)}
+                    className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-200 hover:bg-gold-500/10 hover:text-gold-400 transition-colors"
+                  >
+                    <Briefcase className="w-4 h-4 text-amber-400 shrink-0" />
+                    <span>Minhas Vagas & Candidatos</span>
+                  </Link>
+                )}
+
+                {isAdmin && (
+                  <Link
+                    to="/admin"
+                    onClick={() => setShowMobileDrawer(false)}
+                    className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-bold text-purple-400 hover:bg-purple-500/10 transition-colors"
+                  >
+                    <Shield className="w-4 h-4 shrink-0" />
+                    <span>Painel Administrativo</span>
+                  </Link>
+                )}
+
+                <Link
+                  to="/configuracoes"
+                  onClick={() => setShowMobileDrawer(false)}
+                  className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-navy-850 transition-colors"
+                >
+                  <Settings className="w-4 h-4 text-slate-400 shrink-0" />
+                  <span>Configurações</span>
+                </Link>
+              </nav>
+            </div>
+
+            {/* Bottom Actions of Drawer */}
+            <div className="pt-4 border-t border-slate-200/80 dark:border-navy-800 space-y-2 mt-4">
+              <button
+                type="button"
+                onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+                className="w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-navy-850 transition-colors border border-slate-200 dark:border-navy-800"
+              >
+                <div className="flex items-center gap-2">
+                  {theme === 'dark' ? <Sun className="w-4 h-4 text-gold-400" /> : <Moon className="w-4 h-4 text-slate-600" />}
+                  <span>{theme === 'dark' ? 'Modo Claro' : 'Modo Escuro'}</span>
+                </div>
+                <span className="text-[10px] uppercase font-bold text-slate-400">{theme}</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => {
+                  setShowMobileDrawer(false);
+                  logout();
+                  navigate('/login');
+                }}
+                className="w-full flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl text-xs font-bold text-rose-500 bg-rose-500/10 hover:bg-rose-500/20 transition-colors"
+              >
+                <LogOut className="w-4 h-4" />
+                <span>Encerrar Sessão</span>
+              </button>
+            </div>
+          </aside>
+        </div>
+      )}
     </header>
   );
 };
