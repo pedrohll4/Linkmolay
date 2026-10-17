@@ -173,7 +173,7 @@ export const INITIAL_USERS: UserProfile[] = [
     status: 'approved',
     verified: true,
     avatarUrl: 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?auto=format&fit=crop&w=200&q=80',
-    bio: 'Estudante de Engenharia de Software e desenvolvedor Full-Stack focado em TypeScript, React, Node.js e bancos de dados. Past Mestre Conselheiro do Capítulo Luciano de Assis nº 118. Buscando novos desafios e oportunidades na área de desenvolvimento.',
+    bio: 'Estudante de Engenharia de Software e desenvolvedor Full-Stack focado em TypeScript, React, Node.js e bancos de dados. Membro ativo do Capítulo Luciano de Assis nº 118. Buscando novos desafios e oportunidades na área de desenvolvimento.',
     city: 'Ariquemes',
     state: 'RO',
     phone: '(69) 99345-0011',
@@ -188,7 +188,7 @@ export const INITIAL_USERS: UserProfile[] = [
     demolayDetails: {
       chapterId: 'c1000000-0000-0000-0000-000000000001',
       chapterName: 'Capítulo Luciano de Assis nº 118',
-      orderRank: 'Sênior DeMolay / Past Mestre Conselheiro',
+      orderRank: 'DeMolay Ativo',
       cid: '98451',
       openToWork: true,
       interestAreas: ['Desenvolvimento', 'Tecnologia', 'Engenharia'],

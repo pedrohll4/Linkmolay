@@ -108,7 +108,7 @@ USING (true);
 -- 9. Inserir ou atualizar perfis base no banco de dados na nuvem
 INSERT INTO public.profiles (id, email, full_name, role, status, verified, city, state, bio, phone, show_phone, linkedin_url, github_url)
 VALUES
-  ('d0000000-0000-0000-0000-000000000001', 'pedro.henrique@demolay.org.br', 'Pedro Henrique Lima Leal', 'demolay', 'approved', TRUE, 'Ariquemes', 'RO', 'Estudante de Engenharia de Software, desenvolvedor Full-Stack apaixonado por TypeScript, React e Python. Past Mestre Conselheiro do Cap. Luciano de Assis nº 118.', '(69) 99345-0011', TRUE, 'https://linkedin.com/in/pedro-henrique-demo', 'https://github.com/pedro-demo'),
+  ('d0000000-0000-0000-0000-000000000001', 'pedro.henrique@demolay.org.br', 'Pedro Henrique Lima Leal', 'demolay', 'approved', TRUE, 'Ariquemes', 'RO', 'Estudante de Engenharia de Software, desenvolvedor Full-Stack apaixonado por TypeScript, React e Node.js. Membro do Capítulo Luciano de Assis nº 118.', '(69) 99345-0011', TRUE, 'https://linkedin.com/in/pedro-henrique-demo', 'https://github.com/pedro-demo'),
   ('m0000000-0000-0000-0000-000000000001', 'carlos.silva@silvatech.com.br', 'Carlos Eduardo da Silva', 'mason', 'approved', TRUE, 'Ariquemes', 'RO', 'Empresário do setor de tecnologia, diretor da Silva Tecnologia e entusiasta do desenvolvimento dos jovens DeMolays.', '(69) 99234-5678', TRUE, 'https://linkedin.com/in/carlos-silva-demo', NULL),
   ('a0000000-0000-0000-0000-000000000001', 'admin@linkmolay.com.br', 'Administrador LinkMolay', 'admin', 'approved', TRUE, 'Brasília', 'DF', 'Coordenação Geral da Plataforma LinkMolay e moderação institucional.', NULL, FALSE, NULL, NULL)
 ON CONFLICT (id) DO UPDATE SET

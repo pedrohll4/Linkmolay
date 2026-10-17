@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 600" width="1920" height="600">
+  <defs>
+    <linearGradient id="goldHL" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#E5BE53"/>
+      <stop offset="60%" stop-color="#C49A2E"/>
+      <stop offset="100%" stop-color="#8F6814"/>
+    </linearGradient>
+  </defs>
+  <!-- Monogram -->
+  <g transform="translate(80, 50)">
+    <path d="M 100 100 H 200 V 390 H 380 V 490 H 100 Z" fill="url(#goldHL)"/>
+    <circle cx="450" cy="150" r="60" fill="url(#goldHL)"/>
+  </g>
+  <!-- Typography -->
+  <g transform="translate(640, 320)">
+    <text font-family="'Plus Jakarta Sans', 'Inter', 'Segoe UI', system-ui, sans-serif" font-weight="800" font-size="140" letter-spacing="-2">
+      <tspan fill="#0B132B">LINK</tspan><tspan fill="#C49A2E">MOLAY</tspan>
+    </text>
+    <text y="70" font-family="'Plus Jakarta Sans', 'Inter', 'Segoe UI', system-ui, sans-serif" font-weight="600" font-size="34" letter-spacing="14" fill="#64748B">
+      REDE PROFISSIONAL
+    </text>
+  </g>
+</svg>

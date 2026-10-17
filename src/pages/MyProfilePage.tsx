@@ -83,6 +83,7 @@ export const MyProfilePage: React.FC = () => {
 
   // DeMolay fields
   const [openToWork, setOpenToWork] = useState(currentUser?.demolayDetails?.openToWork ?? false);
+  const [orderRank, setOrderRank] = useState(currentUser?.demolayDetails?.orderRank || 'DeMolay Ativo');
   const [interestAreas, setInterestAreas] = useState<string[]>(
     currentUser?.demolayDetails?.interestAreas || []
   );
@@ -148,6 +149,7 @@ export const MyProfilePage: React.FC = () => {
     if (isDeMolay) {
       updates.demolayDetails = {
         ...currentUser.demolayDetails,
+        orderRank,
         openToWork,
         interestAreas,
         skills,
@@ -227,7 +229,7 @@ export const MyProfilePage: React.FC = () => {
     : currentUser.masonDetails?.lodgeName || 'Loja Maçônica Regular';
 
   const rankTitle = isDeMolay
-    ? currentUser.demolayDetails?.orderRank || 'Sênior DeMolay / Past Mestre Conselheiro'
+    ? currentUser.demolayDetails?.orderRank || 'DeMolay Ativo'
     : currentUser.masonDetails?.profession || 'Mestre Maçom';
 
   return (
@@ -617,6 +619,28 @@ export const MyProfilePage: React.FC = () => {
                 />
               </div>
             </div>
+
+            {/* Grau / Status na Ordem (Para DeMolay) */}
+            {isDeMolay && (
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                    Grau / Status na Ordem
+                  </label>
+                  <select
+                    value={orderRank}
+                    onChange={(e) => setOrderRank(e.target.value)}
+                    className="w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-[#070D1E] px-3 py-2 text-sm text-slate-900 dark:text-white focus:border-amber-400 focus:outline-none"
+                  >
+                    <option value="DeMolay Ativo">DeMolay Ativo</option>
+                    <option value="Sênior DeMolay">Sênior DeMolay</option>
+                    <option value="Past Mestre Conselheiro">Past Mestre Conselheiro</option>
+                    <option value="Chevalier">Chevalier</option>
+                    <option value="Iniciático">Iniciático</option>
+                  </select>
+                </div>
+              </div>
+            )}
 
             {/* Áreas de Interesse (Para DeMolay) */}
             {isDeMolay && (

@@ -237,6 +237,23 @@ export const api = {
           u.demolayDetails.chapterName = 'Capítulo Luciano de Assis nº 118';
           changed = true;
         }
+        if (
+          u.demolayDetails &&
+          (u.demolayDetails.orderRank !== 'DeMolay Ativo' &&
+            (u.demolayDetails.orderRank.includes('Sênior') ||
+              u.demolayDetails.orderRank.includes('Senior') ||
+              u.demolayDetails.orderRank.includes('Past Mestre')))
+        ) {
+          u.demolayDetails.orderRank = 'DeMolay Ativo';
+          changed = true;
+        }
+        if (u.bio && (u.bio.includes('Past Mestre Conselheiro') || u.bio.includes('Sênior') || u.bio.includes('Senior'))) {
+          u.bio = u.bio
+            .replace(/Past Mestre Conselheiro do Cap[íi]tulo Luciano de Assis nº 118\.\s*/g, 'Membro ativo do Capítulo Luciano de Assis nº 118. ')
+            .replace(/Past Mestre Conselheiro do Cap\. Ariquemes\.\s*/g, 'Membro ativo do Capítulo Luciano de Assis nº 118. ')
+            .replace(/Past Mestre Conselheiro/g, 'DeMolay Ativo');
+          changed = true;
+        }
       }
     }
     if (changed) {

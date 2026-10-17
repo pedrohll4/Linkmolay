@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1024" height="1024">
+  <defs>
+    <linearGradient id="goldGradientSmooth" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFE382"/>
+      <stop offset="30%" stop-color="#E5BE53"/>
+      <stop offset="75%" stop-color="#C49A2E"/>
+      <stop offset="100%" stop-color="#936D19"/>
+    </linearGradient>
+    <linearGradient id="dotSmooth" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFF0A5"/>
+      <stop offset="70%" stop-color="#E5BE53"/>
+      <stop offset="100%" stop-color="#B88A24"/>
+    </linearGradient>
+  </defs>
+  <!-- Rounded L Path -->
+  <path d="
+    M 230 210
+    H 330
+    A 30 30 0 0 1 360 240
+    V 640
+    A 30 30 0 0 0 390 670
+    H 610
+    A 30 30 0 0 1 640 700
+    V 800
+    A 30 30 0 0 1 610 830
+    H 230
+    A 30 30 0 0 1 200 800
+    V 240
+    A 30 30 0 0 1 230 210
+    Z"
+    fill="url(#goldGradientSmooth)"
+  />
+  <circle cx="750" cy="290" r="95" fill="url(#dotSmooth)"/>
+</svg>
